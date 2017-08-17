@@ -1,0 +1,52 @@
+<resources>
+    <!-- TODO: 後で修正 -->
+    <string name="app_name">NotePad</string>
+    <string name="add_note">New Note</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="task_marked_complete">Task marked complete</string>
+    <string name="task_marked_active">Task marked active</string>
+    <string name="loading_notes_error">Error while loading notes</string>
+    <string name="no_notes_error">There is no note</string>
+    <string name="all_notes_deleted">All notes deleted</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_all_delete">Delete all notes</string>
+    <string name="menu_delete_task">Delete task</string>
+    <string name="navigation_view_header_title">TO-DOs</string>
+    <string name="title_hint">Title</string>
+    <string name="description_hint">Content</string>
+    <string name="empty_note_message">Note cannot be empty</string>
+    <string name="successfully_saved_note_message">Note saved</string>
+    <string name="list_title">Note List</string>
+    <string-array name="text_share_item">
+        <item>新しくノートを作成する</item>
+        <item>既存のノートに追加する</item>
+        <item>作成後ノートを開く</item>
+        <item>追加後ノートを開く</item>
+        <item>キャンセル</item>
+    </string-array>
+    <string name="select_note">ノートの選択</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_no_tasks">You have no notes.</string>
+    <string name="statistics_active_tasks">Active notes:</string>
+    <string name="statistics_completed_tasks">Completed notes:</string>
+    <string name="statistics_error">Error loading statistics.</string>
+    <string name="no_data">No data</string>
+    <string name="loading">LOADING</string>
+
+    <string-array name="list_tasks_array">
+        <item>@string/nav_all</item>
+        <item>@string/nav_active</item>
+        <item>@string/nav_completed</item>
+    </string-array>
+    <string name="nav_all">All</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_completed">Completed</string>
+    <string name="label_all">All TO-DOs</string>
+    <string name="label_active">Active TO-DOs</string>
+    <string name="label_completed">Completed TO-DOs</string>
+    <string name="no_notes_all">You have no Notes!</string>
+    <string name="no_tasks_active">You have no active TO-DOs!</string>
+    <string name="no_tasks_completed">You have no completed TO-DOs!</string>
+    <string name="no_notes_add">Add a Note item +</string>
+    <string name="refresh">Refresh</string>
+</resources>
