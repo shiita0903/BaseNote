@@ -25,6 +25,7 @@
         <item>キャンセル</item>
     </string-array>
     <string name="select_note">ノートの選択</string>
+    <string name="menu_google_search">Google検索</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tasks">You have no notes.</string>
     <string name="statistics_active_tasks">Active notes:</string>

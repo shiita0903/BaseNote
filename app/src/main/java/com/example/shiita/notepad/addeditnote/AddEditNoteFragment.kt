@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import com.example.shiita.notepad.R
+import com.example.shiita.notepad.util.snackbarLong
+
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
 
@@ -43,6 +43,38 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
+        }
+        content.customSelectionActionModeCallback = object : ActionMode.Callback {
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                var start = 0
+                var end = content.text.length
+
+                if (content.isFocused) {
+                    start = content.selectionStart
+                    end = content.selectionEnd
+                }
+
+                when (item?.itemId) {
+                    R.id.google_search -> {
+                        val sub = content.text.subSequence(start, end)
+                        view?.snackbarLong(sub.toString())
+                        return true
+                    }
+                }
+                return false
+            }
+
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                menu?.add(Menu.NONE, R.id.google_search, Menu.NONE, getString(R.string.menu_google_search))
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return true
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {
+            }
         }
         setHasOptionsMenu(true)
         return root
