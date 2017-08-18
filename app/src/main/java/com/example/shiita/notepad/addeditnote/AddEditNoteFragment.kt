@@ -1,14 +1,17 @@
 package com.example.shiita.notepad.addeditnote
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import com.example.shiita.notepad.R
-import com.flipboard.bottomsheet.BottomSheetLayout
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -19,7 +22,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
 
     private lateinit var content: TextView
 
-    private lateinit var bottomSheet: BottomSheetLayout
+    private lateinit var webView: WebView
+
+    private lateinit var separator: View
 
     override var isActive: Boolean = false
         get() = isAdded
@@ -45,8 +50,17 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
-            bottomSheet = findViewById(R.id.bottom_sheet) as BottomSheetLayout
+            webView = (findViewById(R.id.web_view) as WebView).apply {
+                setWebViewClient(object : WebViewClient() {
+                    override fun onPageFinished(view: WebView, url: String) {
+                        super.onPageFinished(view, url)
+                    }
+                })
+                scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+            }
+            separator = findViewById(R.id.separator)
         }
+
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 var start = 0
@@ -63,7 +77,16 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                     R.id.search_google,
                     R.id.search_wikipedia,
                     R.id.search_weblio -> {
-                        getFragment(word, id[item.itemId]!!).show(activity.supportFragmentManager, R.id.bottom_sheet.toString())
+                        val urlStr = presenter?.generateSearchUrl(word, id[item.itemId]!!)
+                        webView.loadUrl(urlStr)
+                        webView.visibility = View.VISIBLE
+                        separator.visibility = View.VISIBLE
+                        (activity as AddEditNoteActivity).fab.visibility = View.GONE
+                        if (content.isFocused) {
+                            //ソフトキーボードを閉じる
+                            val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
+                        }
                         return true
                     }
 
@@ -106,17 +129,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
 
     override fun setContent(content: String) {
         this.content.text = content
-    }
-
-    private fun getFragment(searchWord: String, searchId: Int): WebViewFragment {
-        return activity.supportFragmentManager.findFragmentById(R.id.bottom_sheet)
-                as WebViewFragment? ?:
-                WebViewFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(WebViewFragment.ARGUMENT_SEARCH_WORD, searchWord)
-                        putInt(WebViewFragment.ARGUMENT_SEARCH_ID, searchId)
-                    }
-                }
     }
 
     companion object {

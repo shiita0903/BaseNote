@@ -43,6 +43,13 @@ class AddEditNotePresenter(
         }
     }
 
+    override fun generateSearchUrl(searchWord: String, searchId: Int): String = when (searchId) {
+        0 -> "http://www.google.co.jp/m/search?hl=ja&q="
+        1 -> "https://ja.wikipedia.org/wiki/"
+        2 -> "http://ejje.weblio.jp/content/"
+        else -> error("SEARCH_IDが間違っています")
+    } + searchWord
+
     private fun createNote(title: String, content: String) {
         val newNote = Note(title, content)
         if (newNote.isEmpty) {

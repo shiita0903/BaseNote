@@ -12,20 +12,22 @@ import com.example.shiita.notepad.R
 class WebViewFragment : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.webview_frag, container, false)
-        val web = root.findViewById(R.id.web_view) as WebView
-        web.setWebViewClient(object : WebViewClient() {
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-            }
-        })
-
         val urlStr = when (arguments.getInt(ARGUMENT_SEARCH_ID)) {
             0 -> "http://www.google.co.jp/m/search?hl=ja&q="
             1 -> "https://ja.wikipedia.org/wiki/"
             2 -> "http://ejje.weblio.jp/content/"
             else -> error("SEARCH_IDが間違っています")
         } + arguments.getString(ARGUMENT_SEARCH_WORD)
-        web.loadUrl(urlStr)
+
+        (root.findViewById(R.id.web_view) as WebView).apply {
+            setWebViewClient(object : WebViewClient() {
+                override fun onPageFinished(view: WebView, url: String) {
+                    super.onPageFinished(view, url)
+                }
+            })
+            scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+            loadUrl(urlStr)
+        }
 
         return root
     }

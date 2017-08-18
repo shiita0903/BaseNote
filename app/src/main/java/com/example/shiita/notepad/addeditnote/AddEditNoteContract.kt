@@ -24,6 +24,8 @@ interface AddEditNoteContract {
 
         fun populateNote()
 
+        fun generateSearchUrl(searchWord: String, searchId: Int): String
+
         var isDataMissing: Boolean
     }
 }
