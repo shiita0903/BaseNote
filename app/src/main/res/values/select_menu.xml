@@ -2,5 +2,11 @@
 <resources>
     <item
         type="id"
-        name="google_search" />
+        name="search_google" />
+    <item
+        type="id"
+        name="search_wikipedia" />
+    <item
+        type="id"
+        name="search_weblio" />
 </resources>

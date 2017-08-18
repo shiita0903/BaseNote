@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.TextView
 import com.example.shiita.notepad.R
-import com.example.shiita.notepad.util.snackbarLong
+import com.flipboard.bottomsheet.BottomSheetLayout
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -18,6 +18,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
     private lateinit var title: TextView
 
     private lateinit var content: TextView
+
+    private lateinit var bottomSheet: BottomSheetLayout
 
     override var isActive: Boolean = false
         get() = isAdded
@@ -43,6 +45,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
+            bottomSheet = findViewById(R.id.bottom_sheet) as BottomSheetLayout
         }
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -54,18 +57,24 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                     end = content.selectionEnd
                 }
 
+                val word = content.text.subSequence(start, end).toString()
+                val id = mapOf(R.id.search_google to 0, R.id.search_wikipedia to 1, R.id.search_weblio to 2)
                 when (item?.itemId) {
-                    R.id.google_search -> {
-                        val sub = content.text.subSequence(start, end)
-                        view?.snackbarLong(sub.toString())
+                    R.id.search_google,
+                    R.id.search_wikipedia,
+                    R.id.search_weblio -> {
+                        getFragment(word, id[item.itemId]!!).show(activity.supportFragmentManager, R.id.bottom_sheet.toString())
                         return true
                     }
+
                 }
                 return false
             }
 
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                menu?.add(Menu.NONE, R.id.google_search, Menu.NONE, getString(R.string.menu_google_search))
+                menu?.add(Menu.NONE, R.id.search_google, Menu.FIRST, getString(R.string.menu_search_google))
+                menu?.add(Menu.NONE, R.id.search_wikipedia, Menu.FIRST, getString(R.string.menu_search_wikipedia))
+                menu?.add(Menu.NONE, R.id.search_weblio, Menu.FIRST, getString(R.string.menu_search_weblio))
                 return true
             }
 
@@ -97,6 +106,17 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
 
     override fun setContent(content: String) {
         this.content.text = content
+    }
+
+    private fun getFragment(searchWord: String, searchId: Int): WebViewFragment {
+        return activity.supportFragmentManager.findFragmentById(R.id.bottom_sheet)
+                as WebViewFragment? ?:
+                WebViewFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(WebViewFragment.ARGUMENT_SEARCH_WORD, searchWord)
+                        putInt(WebViewFragment.ARGUMENT_SEARCH_ID, searchId)
+                    }
+                }
     }
 
     companion object {
