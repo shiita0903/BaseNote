@@ -12,6 +12,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
 import com.example.shiita.notepad.R
+import android.view.MotionEvent
+import android.text.method.Touch.onTouchEvent
+import android.util.Log
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -23,6 +26,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
     private lateinit var content: TextView
 
     private lateinit var webView: WebView
+    private var webViewX = 0
 
     private lateinit var separator: View
 
@@ -46,17 +50,40 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        // スワイプ検知に利用
+        val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(event1: MotionEvent, event2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                val distance = event1.x - event2.x
+                val acceptSideSize = 30
+                val swipeMinDistance = 50
+                val swipeMinVelocity = 300
+
+                // スワイプの移動距離・速度・開始地点の条件がそろえば、WebViewの操作をする
+                if (distance > swipeMinDistance && Math.abs(velocityX) > swipeMinVelocity && event1.x > webViewX - acceptSideSize) {
+                    webView.goForward()
+                } else if (-distance > swipeMinDistance && Math.abs(velocityX) > swipeMinVelocity && event1.x < acceptSideSize) {
+                    webView.goBack()
+                }
+
+                return false
+            }
+        })
         val root = inflater.inflate(R.layout.addeditnote_frag, container, false)
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
             webView = (findViewById(R.id.web_view) as WebView).apply {
+                scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
                 setWebViewClient(object : WebViewClient() {
                     override fun onPageFinished(view: WebView, url: String) {
                         super.onPageFinished(view, url)
                     }
                 })
-                scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+                settings.javaScriptEnabled = true
+                // TouchListenerのeventをそのままGestureDetectorに渡してスワイプの検知
+                setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
+                // WebViewがレイアウトに設置されてから、サイズを測る
+                viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
             separator = findViewById(R.id.separator)
         }
