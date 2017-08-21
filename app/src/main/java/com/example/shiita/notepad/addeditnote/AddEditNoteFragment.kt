@@ -2,10 +2,16 @@ package com.example.shiita.notepad.addeditnote
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.text.Html
+import android.text.Spannable
+import android.text.Spanned
+import android.text.style.URLSpan
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
@@ -14,6 +20,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.example.shiita.notepad.R
+import com.example.shiita.notepad.util.MyURLSpan
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -47,8 +54,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // スワイプ検知に利用
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onFling(event1: MotionEvent, event2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
@@ -79,7 +85,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                         super.onPageFinished(view, url)
                     }
                 })
-                settings.javaScriptEnabled = true
+                settings.apply {
+                    javaScriptEnabled = true
+                    builtInZoomControls = true
+                }
                 // TouchListenerのeventをそのままGestureDetectorに渡してスワイプの検知
                 setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
                 // WebViewがレイアウトに設置されてから、サイズを測る
@@ -94,6 +103,32 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                 }
                 webFrameLayout.visibility = View.GONE
             }
+            val a = if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+                Html.fromHtml("<a href=\"" + "http://petitviolet.hatenablog.com/entry/20131106/1383732344" + "\">リンクテキスト</a>", Html.FROM_HTML_MODE_LEGACY)
+            else
+                Html.fromHtml("<a href=\"" + "http://petitviolet.hatenablog.com/entry/20131106/1383732344" + "\">リンクテキスト</a>")
+            content.append(a)
+            val b = (content.text as Spannable)
+            content.append(" ")
+            content.append(b)
+            val c = a
+            content.append(" ")
+            content.append(c)
+            val spannable = content.text as Spannable
+            val span = spannable.getSpans(0, content.length(), URLSpan::class.java)[0]
+            val start = spannable.getSpanStart(span)
+            val end = spannable.getSpanEnd(span)
+            Log.d("Spannable", span.url + ":" + start + ":" + end)
+            spannable.removeSpan(span)
+            val myURLSpan = MyURLSpan(span.url).apply {
+                onUrlClickListener = { url ->
+                    webView.loadUrl(url)
+                    webFrameLayout.visibility = View.VISIBLE
+                    Log.d("onClick", "Click!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                }
+            }
+            spannable.setSpan(myURLSpan, start, content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            Log.d("After Spannable", span.url + ":" + spannable.getSpanStart(myURLSpan) + ":" + spannable.getSpanEnd(myURLSpan))
         }
 
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -145,6 +180,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
             }
 
             override fun onDestroyActionMode(mode: ActionMode?) {
+                content.clearFocus()
             }
         }
         setHasOptionsMenu(true)
