@@ -15,6 +15,8 @@ import com.example.shiita.notepad.R
 import android.view.MotionEvent
 import android.text.method.Touch.onTouchEvent
 import android.util.Log
+import android.widget.Button
+import android.widget.FrameLayout
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -28,7 +30,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
     private lateinit var webView: WebView
     private var webViewX = 0
 
-    private lateinit var separator: View
+    private lateinit var webFrameLayout: FrameLayout
 
     override var isActive: Boolean = false
         get() = isAdded
@@ -69,6 +71,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
             }
         })
         val root = inflater.inflate(R.layout.addeditnote_frag, container, false)
+        // Viewの初期設定
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
@@ -85,7 +88,12 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            separator = findViewById(R.id.separator)
+            webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
+            (findViewById(R.id.close_web_view_button) as Button).setOnClickListener {
+                // WebViewを閉じる処理。fabを再表示する
+                (activity as AddEditNoteActivity).fab.visibility = View.VISIBLE
+                webFrameLayout.visibility = View.GONE
+            }
         }
 
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -104,10 +112,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                     R.id.search_google,
                     R.id.search_wikipedia,
                     R.id.search_weblio -> {
+                        // web検索時にはfabを消してから表示する
                         val urlStr = presenter?.generateSearchUrl(word, id[item.itemId]!!)
                         webView.loadUrl(urlStr)
-                        webView.visibility = View.VISIBLE
-                        separator.visibility = View.VISIBLE
+                        webFrameLayout.visibility = View.VISIBLE
                         (activity as AddEditNoteActivity).fab.visibility = View.GONE
                         if (content.isFocused) {
                             //ソフトキーボードを閉じる

@@ -36,17 +36,29 @@
         </LinearLayout>
     </ScrollView>
 
-    <View
-        android:id="@+id/separator"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@color/separator"
-        android:visibility="gone"/>
-
-    <WebView
-        android:id="@+id/web_view"
+    <FrameLayout
+        android:id="@+id/web_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:visibility="gone"/>
+        android:visibility="gone">
+
+        <WebView
+            android:id="@+id/web_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separator"/>
+
+        <Button
+            android:id="@+id/close_web_view_button"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="end|top"
+            android:background="#000000"
+            android:src="@drawable/ic_delete"/>
+    </FrameLayout>
 </LinearLayout>
