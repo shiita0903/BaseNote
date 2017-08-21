@@ -10,13 +10,10 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
-import com.example.shiita.notepad.R
-import android.view.MotionEvent
-import android.text.method.Touch.onTouchEvent
-import android.util.Log
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
+import com.example.shiita.notepad.R
 
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
@@ -90,8 +87,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
             }
             webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
             (findViewById(R.id.close_web_view_button) as Button).setOnClickListener {
-                // WebViewを閉じる処理。fabを再表示する
-                (activity as AddEditNoteActivity).fab.visibility = View.VISIBLE
+                // WebViewを閉じる処理。fabとアクションバーを再表示する
+                (activity as AddEditNoteActivity).apply {
+                    fab.visibility = View.VISIBLE
+                    supportActionBar?.show()
+                }
                 webFrameLayout.visibility = View.GONE
             }
         }
@@ -116,7 +116,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                         val urlStr = presenter?.generateSearchUrl(word, id[item.itemId]!!)
                         webView.loadUrl(urlStr)
                         webFrameLayout.visibility = View.VISIBLE
-                        (activity as AddEditNoteActivity).fab.visibility = View.GONE
+                        (activity as AddEditNoteActivity).apply {
+                            fab.visibility = View.GONE
+                            supportActionBar?.hide()
+                            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
+                        }
                         if (content.isFocused) {
                             //ソフトキーボードを閉じる
                             val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
