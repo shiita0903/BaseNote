@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".notes.NotesActivity">
+        <activity
+            android:name=".notes.NotesActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -21,8 +23,7 @@
         <activity android:name=".addeditnote.AddEditNoteActivity"/>
         <activity
             android:name=".textshare.TextShareActivity"
-            android:theme="@style/Theme.TranslucentBackground"
-            android:launchMode="singleInstance">
+            android:theme="@style/Theme.TranslucentBackground">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>

@@ -28,9 +28,6 @@ class TextShareActivity : Activity() {
     fun finishTextShareActivity(startApp: Boolean) {
         if (startApp)
             startActivity(Intent(this, NotesActivity::class.java))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            finishAndRemoveTask()
-        else
-            finish()
+        finish()
     }
 }
