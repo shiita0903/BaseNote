@@ -53,12 +53,13 @@
             android:layout_height="1dp"
             android:background="@color/separator"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/close_web_view_button"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="1dp"
             android:layout_gravity="end|top"
-            android:background="#000000"
-            android:src="@drawable/ic_delete"/>
+            android:background="@null"
+            android:src="@drawable/ic_close"/>
     </FrameLayout>
 </LinearLayout>
