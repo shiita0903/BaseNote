@@ -9,7 +9,9 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.text.Html
 import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
 import android.util.Log
 import android.view.*
@@ -79,6 +81,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         with(root) {
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
+            webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
             webView = (findViewById(R.id.web_view) as WebView).apply {
                 scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
                 setWebViewClient(object : WebViewClient() {
@@ -95,15 +98,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
-            (findViewById(R.id.close_web_view_button) as ImageButton).setOnClickListener {
-                // WebViewを閉じる処理。fabとアクションバーを再表示する
-                (activity as AddEditNoteActivity).apply {
-                    fab.visibility = View.VISIBLE
-                    supportActionBar?.show()
-                }
-                webFrameLayout.visibility = View.GONE
-            }
+            (findViewById(R.id.close_web_view_button) as ImageButton).setOnClickListener { stopWebMode() }
+
             val a = if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
                 Html.fromHtml("<a href=\"" + "http://petitviolet.hatenablog.com/entry/20131106/1383732344" + "\">リンクテキスト</a>", Html.FROM_HTML_MODE_LEGACY)
             else
@@ -151,17 +147,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                         // web検索時にはfabを消してから表示する
                         val urlStr = presenter?.generateSearchUrl(word, id[item.itemId]!!)
                         webView.loadUrl(urlStr)
-                        webFrameLayout.visibility = View.VISIBLE
-                        (activity as AddEditNoteActivity).apply {
-                            fab.visibility = View.GONE
-                            supportActionBar?.hide()
-                            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
-                        }
-                        if (content.isFocused) {
-                            //ソフトキーボードを閉じる
-                            val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
-                        }
+                        startWebMode()
                         return true
                     }
 
@@ -204,21 +190,45 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
     }
 
     override fun setContent(content: String, urlSpanList: List<URLSpanData>) {
-        this.content.text = content
-
         // URLSpanの設定
-        val spannable = this.content.text as Spannable
+        val sb = SpannableStringBuilder()
+        sb.append(content)
         urlSpanList.forEach { urlSpan ->
-            // EditTextではタップできないためonUrlClickListenerは呼ばれない
             val span = MyURLSpan(urlSpan.url).apply {
                 onUrlClickListener = { url ->
-                    // 念のため設定しておく
+                    startWebMode()      // TODO: ここから呼び出すとキーボードが閉じない
                     webView.loadUrl(url)
                     webFrameLayout.visibility = View.VISIBLE
                 }
             }
-            spannable.setSpan(span, urlSpan.start, urlSpan.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(span, urlSpan.start, urlSpan.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
+
+        // タップ時の処理をONにする
+        this.content.movementMethod = LinkMovementMethod.getInstance()
+        this.content.text = sb
+    }
+
+    // Webページを表示する処理。fabとアクションバーを非表示に
+    private fun startWebMode() {
+        webFrameLayout.visibility = View.VISIBLE
+        (activity as AddEditNoteActivity).apply {
+            fab.visibility = View.GONE
+            supportActionBar?.hide()
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
+        }
+        //ソフトキーボードを閉じる
+        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
+    }
+
+    // WebViewを閉じる処理。fabとアクションバー再表示する
+    private fun stopWebMode() {
+        (activity as AddEditNoteActivity).apply {
+            fab.visibility = View.VISIBLE
+            supportActionBar?.show()
+        }
+        webFrameLayout.visibility = View.GONE
     }
 
     private fun getUrlSpanList(): List<URLSpanData> {
