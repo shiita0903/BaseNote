@@ -1,68 +1,80 @@
 package com.example.shiita.notepad.data
 
 import io.realm.Realm
-import io.realm.RealmList
 
+/**
+ * Realmの操作をするobject。Realmのインスタンスはメソッドの終了時にcloseされるため、同期はしない。
+ */
 object NotesDataSource {
 
+    /**
+     * ノートを全て取得して、リストにして返す
+     * @return 全てのノートのリスト
+     */
     fun getNotes(): List<Note> {
-        var notes = emptyList<Note>()
         Realm.getDefaultInstance().use { realm ->
-            // 新しくNoteオブジェクトを作成
-            notes = realm.where(Note::class.java).findAll().map { Note(it.title, it.content, it.urlSpanList, it.id) }
+            return realm.where(Note::class.java)
+                    .findAll()
+                    .map { realm.copyFromRealm(it) }
         }
-        return notes
     }
 
+    /**
+     * ノートのIDで検索し、見つかったならばそれを返す
+     * @param noteId ノートのUUID
+     * @return UUIDに一致したノート。見つからなければnull
+     */
     fun getNote(noteId: String): Note? {
-        var note: Note? = null
         Realm.getDefaultInstance().use { realm ->
-            val result = realm.where(Note::class.java)
+            return realm.where(Note::class.java)
                     .equalTo(Note::id.name, noteId)
-                    .findFirst()
-            if (result != null) {
-                // 入れ子になっているURLSpanDataも作成し直す必要がある
-                val spanList = result.urlSpanList.map { URLSpanData(it.url, it.start, it.end) }
-                note = Note(result.title, result.content, RealmList(*spanList.toTypedArray()), result.id)
-            }
+                    .findAll()  // 見つかるのは1つだが、リストのままでmapを使って加工
+                    .map { realm.copyFromRealm(it) }
+                    .firstOrNull()
         }
-        return note
     }
 
+    /**
+     * ノートを保存する
+     * @param note 保存するノート
+     */
     fun saveNote(note: Note) {
         Realm.getDefaultInstance().use { realm ->
-            realm.executeTransaction { realm ->
-                val realmNote = realm.createObject(Note::class.java, note.id)
-                realmNote.title = note.title
-                realmNote.content = note.content
-                note.urlSpanList.forEach {
-                    realm.copyToRealm(it)
-                    realmNote.urlSpanList.add(it)
-                }
-            }
+            realm.executeTransaction { realm.copyToRealm(note) }
         }
     }
 
+    /**
+     * 全てのノートを削除する
+     */
     fun deleteAllNotes() {
         Realm.getDefaultInstance().use { realm ->
-            realm.executeTransaction { realm ->
-                realm.deleteAll()
-            }
+            realm.executeTransaction { realm.deleteAll() }
         }
     }
 
+    /**
+     * ノートのIDで検索し、見つかったならばそれを削除する
+     * @param noteId ノートのUUID
+     */
     fun deleteNote(noteId: String) {
         Realm.getDefaultInstance().use { realm ->
-            val result = realm.where(Note::class.java).equalTo(Note::id.name, noteId).findFirst()
             realm.executeTransaction {
-                result.deleteFromRealm()
+                realm.where(Note::class.java)
+                        .equalTo(Note::id.name, noteId)
+                        .findFirst()
+                        ?.deleteFromRealm()     // 見つからなかった時のために"?."を使用
             }
         }
     }
 
+    /**
+     * 引数のノートのIDが存在するならば更新し、そうでなければ新規作成する
+     * @param note 更新するノート
+     */
     fun updateNote(note: Note) {
-        // TODO: 消す必要はないかもしれない
-        deleteNote(note.id)
-        saveNote(note)
+        Realm.getDefaultInstance().use { realm ->
+            realm.executeTransaction { realm.copyToRealmOrUpdate(note) }
+        }
     }
 }
