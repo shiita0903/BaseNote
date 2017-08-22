@@ -16,10 +16,11 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.TextView
 import com.example.shiita.notepad.R
+import com.example.shiita.notepad.data.URLSpanData
 import com.example.shiita.notepad.util.MyURLSpan
 
 
@@ -49,7 +50,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         with(activity.findViewById(R.id.fab_edit_note_done) as FloatingActionButton) {
             setImageResource(R.drawable.ic_done)
             setOnClickListener {
-                presenter?.saveNote(title.text.toString(), content.text.toString())
+                presenter?.saveNote(title.text.toString(), content.text.toString(), getUrlSpanList())
             }
         }
     }
@@ -95,7 +96,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
             webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
-            (findViewById(R.id.close_web_view_button) as Button).setOnClickListener {
+            (findViewById(R.id.close_web_view_button) as ImageButton).setOnClickListener {
                 // WebViewを閉じる処理。fabとアクションバーを再表示する
                 (activity as AddEditNoteActivity).apply {
                     fab.visibility = View.VISIBLE
@@ -202,8 +203,30 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View {
         this.title.text = title
     }
 
-    override fun setContent(content: String) {
+    override fun setContent(content: String, urlSpanList: List<URLSpanData>) {
         this.content.text = content
+
+        // URLSpanの設定
+        val spannable = this.content.text as Spannable
+        urlSpanList.forEach { urlSpan ->
+            // EditTextではタップできないためonUrlClickListenerは呼ばれない
+            val span = MyURLSpan(urlSpan.url).apply {
+                onUrlClickListener = { url ->
+                    // 念のため設定しておく
+                    webView.loadUrl(url)
+                    webFrameLayout.visibility = View.VISIBLE
+                }
+            }
+            spannable.setSpan(span, urlSpan.start, urlSpan.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    private fun getUrlSpanList(): List<URLSpanData> {
+        val spannable = (content.text as Spannable)
+        return spannable
+                .getSpans(0, content.length(), MyURLSpan::class.java)
+                ?.map { span -> URLSpanData(span.url, spannable.getSpanStart(span), spannable.getSpanEnd(span)) }
+                ?: emptyList()
     }
 
     companion object {

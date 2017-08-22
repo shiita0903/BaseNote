@@ -2,6 +2,8 @@ package com.example.shiita.notepad.addeditnote
 
 import com.example.shiita.notepad.data.Note
 import com.example.shiita.notepad.data.NotesDataSource
+import com.example.shiita.notepad.data.URLSpanData
+import io.realm.RealmList
 
 class AddEditNotePresenter(
         private val noteId: String?,
@@ -19,11 +21,11 @@ class AddEditNotePresenter(
         }
     }
 
-    override fun saveNote(title: String, content: String) {
+    override fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
         if (noteId == null) {
-            createNote(title, content)
+            createNote(title, content, urlSpanList)
         } else {
-            updateNote(title, content)
+            updateNote(title, content, urlSpanList)
         }
     }
 
@@ -36,7 +38,7 @@ class AddEditNotePresenter(
             if (note != null) {
                 addEditNoteView.run {
                     setTitle(note.title)
-                    setContent(note.content)
+                    setContent(note.content, note.urlSpanList)
                 }
                 isDataMissing = false
             }
@@ -50,8 +52,8 @@ class AddEditNotePresenter(
         else -> error("SEARCH_IDが間違っています")
     } + searchWord
 
-    private fun createNote(title: String, content: String) {
-        val newNote = Note(title, content)
+    private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
+        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()))
         if (newNote.isEmpty) {
             addEditNoteView.showEmptyNoteError()
         } else {
@@ -60,11 +62,11 @@ class AddEditNotePresenter(
         }
     }
 
-    private fun updateNote(title: String, content: String) {
+    private fun updateNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
         if (noteId == null) {
             throw RuntimeException("updateNote() was called but note is new.")
         }
-        NotesDataSource.updateNote(Note(title, content, noteId))
+        NotesDataSource.updateNote(Note(title, content, RealmList(*urlSpanList.toTypedArray()), noteId))
         addEditNoteView.showNotesList() // After an edit, go back to the list.
     }
 }

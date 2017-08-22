@@ -1,5 +1,6 @@
 package com.example.shiita.notepad.data
 
+import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
@@ -9,6 +10,7 @@ import java.util.*
 open class Note(
     open var title: String = "",
     open var content: String = "",
+    open var urlSpanList: RealmList<URLSpanData> = RealmList(),
     @PrimaryKey open var id: String = UUID.randomUUID().toString()
 ) : RealmObject() {
     val titleForList: String
