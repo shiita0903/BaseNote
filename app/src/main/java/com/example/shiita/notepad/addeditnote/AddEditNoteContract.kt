@@ -1,8 +1,10 @@
 package com.example.shiita.notepad.addeditnote
 
+import android.text.Spannable
 import com.example.shiita.notepad.BasePresenter
 import com.example.shiita.notepad.BaseView
 import com.example.shiita.notepad.data.URLSpanData
+import com.example.shiita.notepad.util.MyURLSpan
 
 interface AddEditNoteContract {
 
@@ -25,7 +27,11 @@ interface AddEditNoteContract {
 
         fun populateNote()
 
-        fun generateSearchUrl(searchWord: String, searchId: Int): String
+        fun generateSearchURL(searchWord: String, searchId: Int): String
+
+        fun getURLSpanDataList(spannable: Spannable): List<URLSpanData>
+
+        fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int)
 
         var isDataMissing: Boolean
     }

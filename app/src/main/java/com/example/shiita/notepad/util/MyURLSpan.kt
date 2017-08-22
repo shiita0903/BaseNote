@@ -11,7 +11,15 @@ class MyURLSpan(url: String) : URLSpan(url) {
     /**
      * urlを引数に取るリスナ。
      */
-    var onUrlClickListener: ((String) -> Unit)? = null
+    interface OnURLClickListener {
+        fun onURLClick(url: String)
+    }
 
-    override fun onClick(widget: View?) = onUrlClickListener?.invoke(url) ?: Unit
+    private var listener: OnURLClickListener? = null
+
+    fun setOnURLClickListener(listener: OnURLClickListener) {
+        this.listener = listener
+    }
+
+    override fun onClick(widget: View?) = listener?.onURLClick(url) ?: Unit
 }

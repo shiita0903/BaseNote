@@ -1,8 +1,10 @@
 package com.example.shiita.notepad.addeditnote
 
+import android.text.Spannable
 import com.example.shiita.notepad.data.Note
 import com.example.shiita.notepad.data.NotesDataSource
 import com.example.shiita.notepad.data.URLSpanData
+import com.example.shiita.notepad.util.MyURLSpan
 import io.realm.RealmList
 
 class AddEditNotePresenter(
@@ -45,12 +47,28 @@ class AddEditNotePresenter(
         }
     }
 
-    override fun generateSearchUrl(searchWord: String, searchId: Int): String = when (searchId) {
+    override fun generateSearchURL(searchWord: String, searchId: Int): String = when (searchId) {
         0 -> "http://www.google.co.jp/m/search?hl=ja&q="
         1 -> "https://ja.wikipedia.org/wiki/"
         2 -> "http://ejje.weblio.jp/content/"
         else -> error("SEARCH_IDが間違っています")
     } + searchWord
+
+    override fun getURLSpanDataList(spannable: Spannable): List<URLSpanData> {
+        return spannable
+                .getSpans(0, spannable.length, MyURLSpan::class.java)
+                ?.map { span -> URLSpanData(span.url, spannable.getSpanStart(span), spannable.getSpanEnd(span)) }
+                ?: emptyList()
+    }
+
+    override fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int) {
+        // 新しいspanに被っているspanだけをフィルタして削除
+        spannable.getSpans(0, spannable.length, MyURLSpan::class.java)
+                // ２つのspanの間が一文字空いていればフィルターされない
+                .filterNot { start > spannable.getSpanEnd(it) || end < spannable.getSpanStart(it) }
+                .forEach { spannable.removeSpan(it) }
+        spannable.setSpan(urlSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
 
     private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
         val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()))
