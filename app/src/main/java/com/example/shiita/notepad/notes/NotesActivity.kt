@@ -21,8 +21,6 @@ class NotesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Fabric.with(this, Crashlytics())
         setContentView(R.layout.notes_act)
-        val a: String? = null
-        a!!.toInt()
 
         // Set up the toolbar.
         val toolbar = findViewById(R.id.toolbar) as Toolbar

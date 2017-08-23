@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "639845314113",
+    "firebase_url": "https://basenote-52320.firebaseio.com",
+    "project_id": "basenote-52320",
+    "storage_bucket": "basenote-52320.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639845314113:android:bb2754e578d65566",
+        "android_client_info": {
+          "package_name": "com.example.shiita.notepad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639845314113-ka7vja929ko5ir8muq2ci97ghchvku5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI3CQBSweKDu0BdgCJLYvEbJxDB1vt-e0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
