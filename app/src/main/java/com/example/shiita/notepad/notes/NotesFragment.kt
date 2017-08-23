@@ -1,12 +1,18 @@
 package com.example.shiita.notepad.notes
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.PopupWindow
+import android.widget.TextView
 import com.example.shiita.notepad.R
 import com.example.shiita.notepad.addeditnote.AddEditNoteActivity
 import com.example.shiita.notepad.addeditnote.AddEditNoteFragment
@@ -17,60 +23,67 @@ import java.util.*
 class NotesFragment : Fragment(), NotesContract.View {
 
     override var presenter: NotesContract.Presenter? = null
+    private lateinit var notesView: View
     private lateinit var noNotesView: View
     private lateinit var noNoteMainView: TextView
     private lateinit var noNoteAddView: TextView
-    private lateinit var notesView: LinearLayout
     override var isActive: Boolean = false
         get() = isAdded
 
-    /**
-     * Listener for clicks on notes in the ListView.
-     */
-    internal var itemListener: NoteItemListener = object : NoteItemListener {
-        override fun onNoteClick(clickedNote: Note) {
-            presenter?.editNote(clickedNote)
-        }
+    // RecyclerViewのアダプタ
+    private val notesAdapter by lazy {
+        NotesAdapter(context, ArrayList<Note>(0), object : NotesAdapter.NoteItemListener {
+            override fun onNoteItemClick(clickedNote: Note) = presenter?.editNote(clickedNote) ?: Unit
+        }, object : NotesAdapter.NoteItemMenuListener {
+            override fun onNoteItemMenuClick(clickedNote: Note, menuId: Int) {
+                when(menuId) {
+                    R.id.note_item_menu_delete ->  {
+                        presenter?.deleteNote(clickedNote)
+                        deleteNoteFromAdapter(clickedNote)    // アダプタのノート一覧からも削除する必要がある
+                    }
+                }
+            }
+        })
     }
-
-    private val listAdapter = NotesAdapter(ArrayList<Note>(0), itemListener)
 
     override fun onResume() {
         super.onResume()
         presenter?.start()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        presenter?.result(requestCode, resultCode)
-    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+        = presenter?.result(requestCode, resultCode) ?: Unit
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.notes_frag, container, false)
 
         // Set up notes view
         with(root) {
-            val listView = (findViewById(R.id.notes_list) as ListView).apply {
-                adapter = listAdapter
+            val recyclerView = (findViewById(R.id.notes_recycler_view) as RecyclerView).apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = notesAdapter
+                val dividerItemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                addItemDecoration(dividerItemDecoration)
             }
 
             // Set up progress indicator
             (root.findViewById(R.id.refresh_layout) as ScrollChildSwipeRefreshLayout).run {
                 setColorSchemeColors(
-                        android.support.v4.content.ContextCompat.getColor(activity, R.color.colorPrimary),
-                        android.support.v4.content.ContextCompat.getColor(activity, R.color.colorAccent),
-                        android.support.v4.content.ContextCompat.getColor(activity, R.color.colorPrimaryDark)
+                        android.support.v4.content.ContextCompat.getColor(context, R.color.colorPrimary),
+                        android.support.v4.content.ContextCompat.getColor(context, R.color.colorAccent),
+                        android.support.v4.content.ContextCompat.getColor(context, R.color.colorPrimaryDark)
                 )
                 // Set the scrolling view in the custom SwipeRefreshLayout.
-                scrollUpChild = listView
+                scrollUpChild = recyclerView
                 setOnRefreshListener { presenter?.loadNotes(false) }
             }
 
-            notesView = findViewById(R.id.notesLL) as LinearLayout
+            notesView = findViewById(R.id.notes_view)
 
             // Set up  no notes view
-            noNotesView = findViewById(R.id.noNotes)
-            noNoteMainView = findViewById(R.id.noNotesMain) as TextView
-            noNoteAddView = (findViewById(R.id.noNotesAdd) as TextView).also {
+            noNotesView = findViewById(R.id.no_notes_view)
+            noNoteMainView = findViewById(R.id.no_notes_main) as TextView
+            noNoteAddView = (findViewById(R.id.no_notes_add) as TextView).also {
                 it.setOnClickListener { showAddNote() }
             }
         }
@@ -93,9 +106,8 @@ class NotesFragment : Fragment(), NotesContract.View {
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
-        inflater.inflate(R.menu.notes_fragment_menu, menu)
-    }
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater)
+            = inflater.inflate(R.menu.notes_fragment_menu, menu)
 
     override fun setLoadingIndicator(active: Boolean) {
         val root = view ?: return
@@ -105,8 +117,8 @@ class NotesFragment : Fragment(), NotesContract.View {
         }
     }
 
-    override fun showNotes(notes: List<Note>) {
-        listAdapter.notes = notes
+    override fun showNotes(notes: MutableList<Note>) {
+        notesAdapter.notes = notes
         notesView.visibility = View.VISIBLE
         noNotesView.visibility = View.GONE
     }
@@ -127,6 +139,8 @@ class NotesFragment : Fragment(), NotesContract.View {
         startActivityForResult(intent, AddEditNoteActivity.REQUEST_ADD_NOTE)
     }
 
+    override fun showDeleteNote(title: String) = showMessage(getString(R.string.note_item_delete_message, title))
+
     override fun showDeleteAllNotes() = showMessage(getString(R.string.all_notes_deleted))
 
     override fun showEditNoteUi(noteId: String) {
@@ -142,37 +156,75 @@ class NotesFragment : Fragment(), NotesContract.View {
 
     private fun showMessage(message: String) = view?.snackbarLong(message) ?: Unit
 
-    private class NotesAdapter(notes: List<Note>, private val itemListener: NoteItemListener) : BaseAdapter() {
+    private fun deleteNoteFromAdapter(clickedNote: Note) {
+        notesAdapter.removeItem(clickedNote)
+    }
 
-        var notes: List<Note> = notes
+    private class NotesAdapter(val context: Context, notes: MutableList<Note>
+                               , private val itemListener: NoteItemListener
+                               , private val menuListener: NoteItemMenuListener)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        var notes: MutableList<Note> = notes
             set(notes) {
                 field = notes
                 notifyDataSetChanged()
             }
 
-        override fun getCount() = notes.size
+        private val inflater = LayoutInflater.from(context)
 
-        override fun getItem(i: Int) = notes[i]
-
-        override fun getItemId(i: Int) = i.toLong()
-
-        override fun getView(i: Int, view: View?, viewGroup: ViewGroup): View {
-            val rowView = view ?: LayoutInflater.from(viewGroup.context)
-                    .inflate(R.layout.note_item, viewGroup, false)
-
-            val note = getItem(i)
-
-            (rowView.findViewById(R.id.title) as TextView).run {
-                text = note.titleForList.trimStart()
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            if (holder !is ViewHolder) return
+            if (notes.size > position) {
+                // itemの設定とリスナの登録
+                holder.apply {
+                    textView.text = notes[position].titleForList.trimStart()
+                    itemView.setOnClickListener {
+                        itemListener.onNoteItemClick(notes[position])
+                    }
+                    menu.setOnClickListener {
+                        popup.showAsDropDown(menu, menu.width, -menu.height)    // ポップアップメニューの表示
+                    }
+                    popup.contentView.findViewById(R.id.note_item_menu_delete).setOnClickListener {
+                        menuListener.onNoteItemMenuClick(notes[position], R.id.note_item_menu_delete)
+                        popup.dismiss()
+                    }
+                }
             }
-
-            rowView.setOnClickListener { itemListener.onNoteClick(note) }
-            return rowView
         }
-    }
 
-    interface NoteItemListener {
-        fun onNoteClick(clickedNote: Note)
+        override fun getItemCount(): Int = notes.size
+
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder
+            = ViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
+
+        // ViewHolderに対するクリックリスナはonBindViewHolderで登録
+        class ViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+            val textView = itemView.findViewById(R.id.note_item_title) as TextView
+            val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton
+            val popup = PopupWindow(context).apply {
+                contentView = LayoutInflater.from(context).inflate(R.layout.note_menu, null)
+                isOutsideTouchable = true
+                isFocusable = true
+                isTouchable = true
+            }
+        }
+
+        fun removeItem(clickedNote: Note) {
+            val position = notes.indexOf(clickedNote)
+            notes.removeAt(position)
+            notifyItemRemoved(position)
+        }
+
+        // RecyclerViewのアイテムタップ時のリスナ
+        interface NoteItemListener {
+            fun onNoteItemClick(clickedNote: Note)
+        }
+
+        // RecyclerViewのアイテムのメニュータップ時のリスナ
+        interface NoteItemMenuListener {
+            fun onNoteItemMenuClick(clickedNote: Note, menuId: Int)
+        }
     }
 
     companion object {

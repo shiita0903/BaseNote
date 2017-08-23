@@ -28,6 +28,9 @@
     <string name="menu_search_google">Google</string>
     <string name="menu_search_wikipedia">Wikipedia</string>
     <string name="menu_search_weblio">weblio</string>
+    <string name="note_item_menu_delete">削除</string>
+    <string name="note_item_delete_message">「%1$s」を削除しました</string>
+
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tasks">You have no notes.</string>
     <string name="statistics_active_tasks">Active notes:</string>

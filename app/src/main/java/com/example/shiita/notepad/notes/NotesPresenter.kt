@@ -31,6 +31,11 @@ class NotesPresenter(val notesView: NotesContract.View) : NotesContract.Presente
         firstLoad = false
     }
 
+    override fun deleteNote(note: Note) {
+        NotesDataSource.deleteNote(note.id)
+        notesView.showDeleteNote(note.titleForList)
+    }
+
     override fun deleteAllNotes() {
         if (NotesDataSource.getNotes().isEmpty()) {
             notesView.showNoNotesError()
@@ -72,7 +77,7 @@ class NotesPresenter(val notesView: NotesContract.View) : NotesContract.Presente
         if (notes.isEmpty()) {
             notesView.showNoNotes()
         } else {
-            notesView.showNotes(notes)
+            notesView.showNotes(notes.toMutableList())
         }
     }
 

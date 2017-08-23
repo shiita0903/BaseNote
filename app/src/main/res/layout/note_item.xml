@@ -5,16 +5,24 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:background="@drawable/touch_feedback"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/list_item_padding"
-    android:paddingTop="@dimen/list_item_padding">
+    android:paddingLeft="@dimen/activity_horizontal_margin">
 
     <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
+        android:id="@+id/note_item_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        android:maxLines="1"/>
+
+    <ImageButton
+        android:id="@+id/note_item_menu"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:background="#00000000"
+        android:src="@drawable/ic_recycler_menu"/>
 </LinearLayout>

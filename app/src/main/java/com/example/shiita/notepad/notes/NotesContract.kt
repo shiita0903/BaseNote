@@ -9,9 +9,11 @@ interface NotesContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun showNotes(notes: List<Note>)
+        fun showNotes(notes: MutableList<Note>)
 
         fun showAddNote()
+
+        fun showDeleteNote(title: String)
 
         fun showDeleteAllNotes()
 
@@ -33,6 +35,8 @@ interface NotesContract {
         fun result(requestCode: Int, resultCode: Int)
 
         fun loadNotes(forceUpdate: Boolean)
+
+        fun deleteNote(note: Note)
 
         fun deleteAllNotes()
 
