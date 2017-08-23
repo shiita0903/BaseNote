@@ -30,5 +30,8 @@
                 <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="6e3d47cfb2f7c7c437ab702c5565ca43ea4b1f71" />
     </application>
 </manifest>

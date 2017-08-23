@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import com.example.shiita.notepad.R
 import com.example.shiita.notepad.util.addFragmentToActivity
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 
 class NotesActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -17,7 +19,10 @@ class NotesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Fabric.with(this, Crashlytics())
         setContentView(R.layout.notes_act)
+        val a: String? = null
+        a!!.toInt()
 
         // Set up the toolbar.
         val toolbar = findViewById(R.id.toolbar) as Toolbar
