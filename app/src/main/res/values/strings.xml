@@ -1,6 +1,6 @@
 <resources>
     <!-- TODO: 後で修正 -->
-    <string name="app_name">NotePad</string>
+    <string name="app_name">BaseNote</string>
     <string name="add_note">New Note</string>
     <string name="edit_note">Edit Note</string>
     <string name="task_marked_complete">Task marked complete</string>

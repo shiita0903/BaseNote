@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.shiita.notepad.notes.ScrollChildSwipeRefreshLayout
+<jp.shiita.basenote.notes.ScrollChildSwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
@@ -47,4 +47,4 @@
                 android:text="@string/no_notes_add" />
         </LinearLayout>
     </RelativeLayout>
-</com.example.shiita.notepad.notes.ScrollChildSwipeRefreshLayout>
+</jp.shiita.basenote.notes.ScrollChildSwipeRefreshLayout>

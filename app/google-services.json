@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:639845314113:android:bb2754e578d65566",
+        "mobilesdk_app_id": "1:639845314113:android:378554b0f5e4ffb6",
         "android_client_info": {
-          "package_name": "com.example.shiita.notepad"
+          "package_name": "jp.shiita.basenote"
         }
       },
       "oauth_client": [
