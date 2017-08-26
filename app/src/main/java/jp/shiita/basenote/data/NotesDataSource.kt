@@ -16,6 +16,7 @@ object NotesDataSource {
             return realm.where(Note::class.java)
                     .findAll()
                     .map { realm.copyFromRealm(it) }
+                    .sortedByDescending { it.date }     // 日付の降順
         }
     }
 

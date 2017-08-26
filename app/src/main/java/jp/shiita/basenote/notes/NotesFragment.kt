@@ -18,6 +18,7 @@ import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.util.snackbarLong
+import java.util.*
 
 class NotesFragment : Fragment(), NotesContract.View {
 
@@ -160,10 +161,13 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (holder !is ViewHolder) return   // スマートキャスト
+
+            val note = notes[position]
             if (notes.size > position) {
                 // itemの設定とリスナの登録
                 holder.apply {
-                    textView.text = notes[position].titleForList.trimStart()
+                    title.text = note.titleForList.trimStart()
+                    date.text = Note.format.format(Date(note.date))
                     itemView.setOnClickListener {
                         onClickNoteItem(holder.adapterPosition)
                     }
@@ -185,7 +189,8 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         // ViewHolderに対するクリックリスナはonBindViewHolderで登録
         class ViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
-            val textView = itemView.findViewById(R.id.note_item_title) as TextView
+            val title = itemView.findViewById(R.id.note_item_title) as TextView
+            val date = itemView.findViewById(R.id.note_item_date) as TextView
             val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton
             val popup = PopupWindow(context).apply {
                 contentView = LayoutInflater.from(context).inflate(R.layout.note_menu, null)
