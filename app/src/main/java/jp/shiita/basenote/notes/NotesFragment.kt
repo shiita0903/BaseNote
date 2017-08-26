@@ -22,28 +22,11 @@ import jp.shiita.basenote.util.snackbarLong
 class NotesFragment : Fragment(), NotesContract.View {
 
     override var presenter: NotesContract.Presenter? = null
+    private lateinit var notesAdapter: NotesAdapter
     private lateinit var notesView: View
     private lateinit var noNotesView: View
-    private lateinit var noNoteMainView: TextView
-    private lateinit var noNoteAddView: TextView
     override var isActive: Boolean = false
         get() = isAdded
-
-    // RecyclerViewのアダプタ
-    private val notesAdapter by lazy {
-        NotesAdapter(context, ArrayList(0), object : NotesAdapter.NoteItemListener {
-            override fun onNoteItemClick(clickedNote: Note) = presenter?.editNote(clickedNote) ?: Unit
-        }, object : NotesAdapter.NoteItemMenuListener {
-            override fun onNoteItemMenuClick(clickedNote: Note, menuId: Int) {
-                when(menuId) {
-                    R.id.note_item_menu_delete ->  {
-                        presenter?.deleteNote(clickedNote)
-                        deleteNoteFromAdapter(clickedNote)    // アダプタのノート一覧からも削除する必要がある
-                    }
-                }
-            }
-        })
-    }
 
     override fun onResume() {
         super.onResume()
@@ -55,6 +38,21 @@ class NotesFragment : Fragment(), NotesContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.notes_frag, container, false)
+
+        notesAdapter = NotesAdapter(context, mutableListOf()).apply {
+            onClickNoteItem = { position -> presenter?.editNote(getItem(position)) }    // RecyclerViewの要素自体をタップ時
+            onClickNoteItemMenu = { position, menuId ->                                 // RecyclerViewの要素のメニューをタップ時
+                val note = getItem(position)
+                when(menuId) {
+                    R.id.note_item_menu_delete -> {
+                        presenter?.deleteNote(note)
+                        removeItem(position)    // アダプタのノート一覧からも削除する必要がある
+                        if (notesAdapter.itemCount == 0)
+                            showNoNotes()
+                    }
+                }
+            }
+        }
 
         // Set up notes view
         with(root) {
@@ -79,11 +77,10 @@ class NotesFragment : Fragment(), NotesContract.View {
 
             notesView = findViewById(R.id.notes_view)
 
-            // Set up  no notes view
+            // Set up no notes view
             noNotesView = findViewById(R.id.no_notes_view)
-            noNoteMainView = findViewById(R.id.no_notes_main) as TextView
-            noNoteAddView = (findViewById(R.id.no_notes_add) as TextView).also {
-                it.setOnClickListener { showAddNote() }
+            (findViewById(R.id.no_notes_add) as TextView).run {
+                setOnClickListener { showAddNote() }
             }
         }
 
@@ -105,8 +102,7 @@ class NotesFragment : Fragment(), NotesContract.View {
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater)
-            = inflater.inflate(R.menu.notes_fragment_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.notes_fragment_menu, menu)
 
     override fun setLoadingIndicator(active: Boolean) {
         val root = view ?: return
@@ -122,16 +118,12 @@ class NotesFragment : Fragment(), NotesContract.View {
         noNotesView.visibility = View.GONE
     }
 
-    override fun showNoNotes() = showNoNotesViews(resources.getString(R.string.no_notes_all), true)
-
-    override fun showSuccessfullySavedMessage() = showMessage(getString(R.string.successfully_saved_note_message))
-
-    private fun showNoNotesViews(mainText: String, showAddView: Boolean) {
+    override fun showNoNotes() {
         notesView.visibility = View.GONE
         noNotesView.visibility = View.VISIBLE
-        noNoteMainView.text = mainText
-        noNoteAddView.visibility = if (showAddView) View.VISIBLE else View.GONE
     }
+
+    override fun showSuccessfullySavedMessage() = showMessage(getString(R.string.successfully_saved_note_message))
 
     override fun showAddNote() {
         val intent = Intent(context, AddEditNoteActivity::class.java)
@@ -155,13 +147,7 @@ class NotesFragment : Fragment(), NotesContract.View {
 
     private fun showMessage(message: String) = view?.snackbarLong(message) ?: Unit
 
-    private fun deleteNoteFromAdapter(clickedNote: Note) {
-        notesAdapter.removeItem(clickedNote)
-    }
-
-    private class NotesAdapter(val context: Context, notes: MutableList<Note>
-                               , private val itemListener: NoteItemListener
-                               , private val menuListener: NoteItemMenuListener)
+    private class NotesAdapter(val context: Context, notes: MutableList<Note>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var notes: MutableList<Note> = notes
@@ -173,19 +159,19 @@ class NotesFragment : Fragment(), NotesContract.View {
         private val inflater = LayoutInflater.from(context)
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (holder !is ViewHolder) return
+            if (holder !is ViewHolder) return   // スマートキャスト
             if (notes.size > position) {
                 // itemの設定とリスナの登録
                 holder.apply {
                     textView.text = notes[position].titleForList.trimStart()
                     itemView.setOnClickListener {
-                        itemListener.onNoteItemClick(notes[position])
+                        onClickNoteItem(holder.adapterPosition)
                     }
                     menu.setOnClickListener {
                         popup.showAsDropDown(menu, menu.width, -menu.height)    // ポップアップメニューの表示
                     }
                     popup.contentView.findViewById(R.id.note_item_menu_delete).setOnClickListener {
-                        menuListener.onNoteItemMenuClick(notes[position], R.id.note_item_menu_delete)
+                        onClickNoteItemMenu(holder.adapterPosition, R.id.note_item_menu_delete)
                         popup.dismiss()
                     }
                 }
@@ -209,21 +195,22 @@ class NotesFragment : Fragment(), NotesContract.View {
             }
         }
 
-        fun removeItem(clickedNote: Note) {
-            val position = notes.indexOf(clickedNote)
+        fun removeItem(position: Int) {
+            require(position in 0 until itemCount)
             notes.removeAt(position)
             notifyItemRemoved(position)
         }
 
-        // RecyclerViewのアイテムタップ時のリスナ
-        interface NoteItemListener {
-            fun onNoteItemClick(clickedNote: Note)
+        fun getItem(position: Int): Note {
+            require(position in 0 until itemCount)
+            return notes[position]
         }
 
+        // RecyclerViewのアイテムタップ時のリスナ
+        lateinit var onClickNoteItem: (position: Int) -> Unit
+
         // RecyclerViewのアイテムのメニュータップ時のリスナ
-        interface NoteItemMenuListener {
-            fun onNoteItemMenuClick(clickedNote: Note, menuId: Int)
-        }
+        lateinit var onClickNoteItemMenu: (position: Int, menuId: Int) -> Unit
     }
 
     companion object {
