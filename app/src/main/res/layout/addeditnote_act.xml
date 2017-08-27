@@ -37,7 +37,18 @@
                 android:layout_height="match_parent" />
 
             <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_edit_note_done"
+                android:id="@+id/fab_edit_note_done_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:src="@drawable/ic_add"
+                android:visibility="gone"
+                app:fabSize="normal"
+                app:layout_anchor="@id/contentFrame"
+                app:layout_anchorGravity="top|right|end" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_edit_note_done_bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"

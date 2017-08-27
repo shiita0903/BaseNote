@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.View
 import jp.shiita.basenote.R
 import jp.shiita.basenote.util.addFragmentToActivity
 
 class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var addEditNotePresenter: AddEditNotePresenter
-    lateinit var fab: FloatingActionButton
+    lateinit var fabTop: FloatingActionButton
+    lateinit var fabBottom: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +24,8 @@ class AddEditNoteActivity : AppCompatActivity() {
             it.setDisplayHomeAsUpEnabled(true)
             it.setDisplayShowHomeEnabled(true)
         }
-        fab = findViewById(R.id.fab_edit_note_done) as FloatingActionButton
+        fabTop = findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton
+        fabBottom = findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton
 
         val noteId = intent.getStringExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)
         setToolbarTitle(noteId)
@@ -62,6 +65,16 @@ class AddEditNoteActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    fun showTopFab() {
+        fabTop.visibility = View.VISIBLE
+        fabBottom.visibility = View.GONE
+    }
+
+    fun showBottomFab() {
+        fabBottom.visibility = View.VISIBLE
+        fabTop.visibility = View.GONE
     }
 
     private fun getFragment(noteId: String?): AddEditNoteFragment  {

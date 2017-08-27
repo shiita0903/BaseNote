@@ -32,6 +32,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     private lateinit var webView: WebView
     private var webViewX = 0
 
+    private lateinit var closeWebViewButton: ImageButton
+
     private lateinit var webFrameLayout: FrameLayout
 
     override var isActive: Boolean = false
@@ -44,7 +46,14 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        with(activity.findViewById(R.id.fab_edit_note_done) as FloatingActionButton) {
+        with(activity.findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton) {
+            setImageResource(R.drawable.ic_done)
+            setOnClickListener {
+                val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
+                presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
+            }
+        }
+        with(activity.findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton) {
             setImageResource(R.drawable.ic_done)
             setOnClickListener {
                 val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
@@ -54,6 +63,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // 画面起動時にソフトウェアキーボードを出さない
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         // スワイプ検知に利用
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onFling(event1: MotionEvent, event2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
@@ -87,14 +98,15 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 })
                 settings.apply {
                     javaScriptEnabled = true
-                    builtInZoomControls = true
                 }
                 // TouchListenerのeventをそのままGestureDetectorに渡してスワイプの検知
                 setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            (findViewById(R.id.close_web_view_button) as ImageButton).setOnClickListener { stopWebMode() }
+            closeWebViewButton = (findViewById(R.id.close_web_view_button) as ImageButton).apply {
+                setOnClickListener { stopWebMode() }
+            }
         }
 
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -181,28 +193,32 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         startWebMode()
         webView.loadUrl(url)
         webFrameLayout.visibility = View.VISIBLE
+        closeWebViewButton.visibility = View.VISIBLE
     }
 
     // Webページを表示する処理。fabとアクションバーを非表示に
     private fun startWebMode() {
-        webFrameLayout.visibility = View.VISIBLE
-        (activity as AddEditNoteActivity).apply {
-            fab.visibility = View.GONE
-            supportActionBar?.hide()
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
-        }
         //ソフトキーボードを閉じる
         val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
+
+        webFrameLayout.visibility = View.VISIBLE
+        closeWebViewButton.visibility = View.VISIBLE
+        (activity as AddEditNoteActivity).apply {
+            showTopFab()
+            supportActionBar?.hide()
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
+        }
     }
 
     // WebViewを閉じる処理。fabとアクションバー再表示する
     private fun stopWebMode() {
         (activity as AddEditNoteActivity).apply {
-            fab.visibility = View.VISIBLE
+            showBottomFab()
             supportActionBar?.show()
         }
         webFrameLayout.visibility = View.GONE
+        closeWebViewButton.visibility = View.GONE
     }
 
     companion object {
