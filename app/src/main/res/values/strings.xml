@@ -7,10 +7,15 @@
     <string name="task_marked_active">Task marked active</string>
     <string name="loading_notes_error">Error while loading notes</string>
     <string name="no_notes_error">There is no note</string>
+
     <string name="all_notes_deleted">All notes deleted</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_all_delete">Delete all notes</string>
     <string name="menu_delete_task">Delete task</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_edit">編集</string>
+    <string name="menu_edit_finish">完了</string>
+
     <string name="navigation_view_header_title">TO-DOs</string>
     <string name="title_hint">Title</string>
     <string name="description_hint">Content</string>
@@ -54,5 +59,4 @@
     <string name="no_tasks_active">You have no active TO-DOs!</string>
     <string name="no_tasks_completed">You have no completed TO-DOs!</string>
     <string name="no_notes_add">Add a Note item +</string>
-    <string name="refresh">Refresh</string>
 </resources>

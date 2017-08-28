@@ -36,6 +36,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     private lateinit var webFrameLayout: FrameLayout
 
+    private var editMode = true
+    private var webMode = false
+
     override var isActive: Boolean = false
         get() = isAdded
 
@@ -47,14 +50,12 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         with(activity.findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton) {
-            setImageResource(R.drawable.ic_done)
             setOnClickListener {
                 val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
                 presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
             }
         }
         with(activity.findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton) {
-            setImageResource(R.drawable.ic_done)
             setOnClickListener {
                 val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
                 presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
@@ -122,11 +123,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 val word = content.text.subSequence(start, end).toString()
                 val id = mapOf(R.id.search_google to 0, R.id.search_wikipedia to 1, R.id.search_weblio to 2)
                 when (item?.itemId) {
-                    R.id.search_google,
-                    R.id.search_wikipedia,
-                    R.id.search_weblio -> {
+                    in id.keys -> {
                         startWebMode()
-                        val urlStr = presenter?.generateSearchURL(word, id[item.itemId]!!)
+                        val urlStr = presenter?.generateSearchURL(word, id[item?.itemId]!!)
                         if (urlStr != null) {
                             // MyURLSpanの設定
                             val span = MyURLSpan(urlStr).apply {
@@ -143,9 +142,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             }
 
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                menu?.add(Menu.NONE, R.id.search_google, Menu.FIRST, getString(R.string.menu_search_google))
-                menu?.add(Menu.NONE, R.id.search_wikipedia, Menu.FIRST, getString(R.string.menu_search_wikipedia))
-                menu?.add(Menu.NONE, R.id.search_weblio, Menu.FIRST, getString(R.string.menu_search_weblio))
+                menu?.run {
+                    add(Menu.NONE, R.id.search_google, Menu.FIRST, getString(R.string.menu_search_google))
+                    add(Menu.NONE, R.id.search_wikipedia, Menu.FIRST, getString(R.string.menu_search_wikipedia))
+                    add(Menu.NONE, R.id.search_weblio, Menu.FIRST, getString(R.string.menu_search_weblio))
+                }
                 return true
             }
 
@@ -155,9 +156,26 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 content.clearFocus()
             }
         }
+
         setHasOptionsMenu(true)
         return root
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        super.onPrepareOptionsMenu(menu)
+        // editModeによって表示するメニューを動的に変える
+        menu?.findItem(R.id.menu_edit)?.isVisible = !editMode
+        menu?.findItem(R.id.menu_edit_finish)?.isVisible = editMode
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_edit, R.id.menu_edit_finish -> switchEditMode()
+        }
+        return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
 
     override fun showEmptyNoteError() = title.snackbarLong(getString(R.string.empty_note_message))
 
@@ -189,7 +207,30 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         this.content.text = sb
     }
 
+    override fun switchEditMode() {
+        editMode = !editMode
+
+        // フォーカスが与えられるかどうかで、編集の可否を制御
+        title.isFocusable = editMode
+        title.isFocusableInTouchMode = editMode
+        content.isFocusable = editMode
+        content.isFocusableInTouchMode = editMode
+
+        val act = (activity as AddEditNoteActivity)
+        when {
+            editMode && webMode -> act.showTopFab()
+            editMode && !webMode -> act.showBottomFab()
+            !editMode -> act.hideFab()
+        }
+
+        // メニューの書き換え
+        activity.invalidateOptionsMenu()
+
+        hideSoftInput()
+    }
+
     override fun onURLClick(url: String) {
+        if (editMode) return    // 編集中は無効化
         startWebMode()
         webView.loadUrl(url)
         webFrameLayout.visibility = View.VISIBLE
@@ -198,27 +239,34 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     // Webページを表示する処理。fabとアクションバーを非表示に
     private fun startWebMode() {
-        //ソフトキーボードを閉じる
-        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
-
+        hideSoftInput()
         webFrameLayout.visibility = View.VISIBLE
         closeWebViewButton.visibility = View.VISIBLE
         (activity as AddEditNoteActivity).apply {
-            showTopFab()
+            if (editMode)
+                showTopFab()
             supportActionBar?.hide()
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
         }
+        webMode = true
     }
 
     // WebViewを閉じる処理。fabとアクションバー再表示する
     private fun stopWebMode() {
         (activity as AddEditNoteActivity).apply {
-            showBottomFab()
+            if (editMode)
+                showBottomFab()
             supportActionBar?.show()
         }
         webFrameLayout.visibility = View.GONE
         closeWebViewButton.visibility = View.GONE
+        webMode = false
+    }
+
+    //ソフトキーボードを閉じる
+    private fun hideSoftInput() {
+        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
     }
 
     companion object {

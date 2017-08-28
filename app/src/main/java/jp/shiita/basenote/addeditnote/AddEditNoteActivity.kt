@@ -10,8 +10,8 @@ import jp.shiita.basenote.util.addFragmentToActivity
 
 class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var addEditNotePresenter: AddEditNotePresenter
-    lateinit var fabTop: FloatingActionButton
-    lateinit var fabBottom: FloatingActionButton
+    private lateinit var fabTop: FloatingActionButton
+    private lateinit var fabBottom: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +75,11 @@ class AddEditNoteActivity : AppCompatActivity() {
     fun showBottomFab() {
         fabBottom.visibility = View.VISIBLE
         fabTop.visibility = View.GONE
+    }
+
+    fun hideFab() {
+        fabTop.visibility = View.GONE
+        fabBottom.visibility = View.GONE
     }
 
     private fun getFragment(noteId: String?): AddEditNoteFragment  {

@@ -20,6 +20,7 @@ class AddEditNotePresenter(
     override fun start() {
         if (noteId != null && isDataMissing) {
             populateNote()
+            addEditNoteView.switchEditMode()
         }
     }
 

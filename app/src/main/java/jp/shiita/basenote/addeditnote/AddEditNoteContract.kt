@@ -18,6 +18,8 @@ interface AddEditNoteContract {
 
         fun setContent(content: String, urlSpanList: List<URLSpanData>)
 
+        fun switchEditMode()
+
         var isActive: Boolean
     }
 
