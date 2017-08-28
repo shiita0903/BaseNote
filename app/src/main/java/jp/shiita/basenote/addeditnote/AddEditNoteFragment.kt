@@ -1,6 +1,5 @@
 package jp.shiita.basenote.addeditnote
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -50,16 +49,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         with(activity.findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton) {
-            setOnClickListener {
-                val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
-                presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
-            }
+            setOnClickListener { switchEditMode() }
         }
         with(activity.findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton) {
-            setOnClickListener {
-                val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
-                presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
-            }
+            setOnClickListener { switchEditMode() }
         }
     }
 
@@ -161,30 +154,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         return root
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
-        super.onPrepareOptionsMenu(menu)
-        // editModeによって表示するメニューを動的に変える
-        menu?.findItem(R.id.menu_edit)?.isVisible = !editMode
-        menu?.findItem(R.id.menu_edit_finish)?.isVisible = editMode
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_edit, R.id.menu_edit_finish -> switchEditMode()
-        }
-        return true
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
-
     override fun showEmptyNoteError() = title.snackbarLong(getString(R.string.empty_note_message))
-
-    override fun showNotesList() {
-        with(activity) {
-            setResult(Activity.RESULT_OK)
-            finish()
-        }
-    }
 
     override fun setTitle(title: String) {
         this.title.text = title
@@ -196,7 +166,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         sb.append(content)
         urlSpanList.forEach { urlSpan ->
             val span = MyURLSpan(urlSpan.url).apply {
-                // TODO: ここから呼び出すとキーボードが閉じない
                 setOnURLClickListener(this@AddEditNoteFragment)
             }
             sb.setSpan(span, urlSpan.start, urlSpan.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -218,13 +187,14 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
         val act = (activity as AddEditNoteActivity)
         when {
-            editMode && webMode -> act.showTopFab()
-            editMode && !webMode -> act.showBottomFab()
-            !editMode -> act.hideFab()
+            editMode -> act.setFabIconResource(R.drawable.ic_done)
+            !editMode -> {
+                act.setFabIconResource(R.drawable.ic_edit)
+                // 編集モードから抜けた時に保存処理をする
+                val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
+                presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
+            }
         }
-
-        // メニューの書き換え
-        activity.invalidateOptionsMenu()
 
         hideSoftInput()
     }
@@ -243,8 +213,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         webFrameLayout.visibility = View.VISIBLE
         closeWebViewButton.visibility = View.VISIBLE
         (activity as AddEditNoteActivity).apply {
-            if (editMode)
-                showTopFab()
+            showTopFab()
             supportActionBar?.hide()
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
         }
@@ -254,8 +223,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     // WebViewを閉じる処理。fabとアクションバー再表示する
     private fun stopWebMode() {
         (activity as AddEditNoteActivity).apply {
-            if (editMode)
-                showBottomFab()
+            showBottomFab()
             supportActionBar?.show()
         }
         webFrameLayout.visibility = View.GONE

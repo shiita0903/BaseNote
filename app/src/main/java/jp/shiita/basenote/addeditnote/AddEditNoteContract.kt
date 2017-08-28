@@ -12,8 +12,6 @@ interface AddEditNoteContract {
 
         fun showEmptyNoteError()
 
-        fun showNotesList()
-
         fun setTitle(title: String)
 
         fun setContent(content: String, urlSpanList: List<URLSpanData>)

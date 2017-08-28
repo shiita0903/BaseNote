@@ -77,9 +77,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         fabTop.visibility = View.GONE
     }
 
-    fun hideFab() {
-        fabTop.visibility = View.GONE
-        fabBottom.visibility = View.GONE
+    fun setFabIconResource(id: Int) {
+        fabTop.setImageResource(id)
+        fabBottom.setImageResource(id)
     }
 
     private fun getFragment(noteId: String?): AddEditNoteFragment  {

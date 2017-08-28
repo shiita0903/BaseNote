@@ -77,7 +77,6 @@ class AddEditNotePresenter(
             addEditNoteView.showEmptyNoteError()
         } else {
             NotesDataSource.saveNote(newNote)
-            addEditNoteView.showNotesList()
         }
     }
 
@@ -86,6 +85,5 @@ class AddEditNotePresenter(
             throw RuntimeException("updateNote() was called but note is new.")
         }
         NotesDataSource.updateNote(Note(title, content, RealmList(*urlSpanList.toTypedArray()), id = noteId))
-        addEditNoteView.showNotesList() // After an edit, go back to the list.
     }
 }
