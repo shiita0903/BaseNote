@@ -225,6 +225,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         (activity as AddEditNoteActivity).apply {
             showBottomFab()
             supportActionBar?.show()
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
         webFrameLayout.visibility = View.GONE
         closeWebViewButton.visibility = View.GONE
