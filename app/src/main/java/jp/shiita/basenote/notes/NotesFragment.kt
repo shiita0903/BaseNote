@@ -120,7 +120,7 @@ class NotesFragment : Fragment(), NotesContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_refresh -> presenter?.loadNotes(true)
-            R.id.menu_delete_all -> presenter?.deleteAllNotes()
+            R.id.menu_delete_all -> presenter?.deleteAllNotes((activity as NotesActivity).filterTag)
         }
         return true
     }

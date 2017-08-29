@@ -30,16 +30,20 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
         notesView.showDeleteNote(note.titleForList)
     }
 
-    override fun deleteAllNotes() {
-        if (NotesDataSource.getNotes().isEmpty()) {
+    override fun deleteAllNotes(tag: Int) {
+        val empty = if (tag == 0) NotesDataSource.getNotes().isEmpty()
+                    else          NotesDataSource.getNotes().any { it.tag == tag }.not()
+        if (empty) {
             notesView.showNoNotesError()
             return
         }
-        NotesDataSource.deleteAllNotes()
+        if (tag == 0) NotesDataSource.deleteAllNotes()
+        else          NotesDataSource.deleteAllNotes(tag)
         if (!notesView.isActive) {
             return
         }
-        notesView.showNoNotes()
+        if (tag == 0) notesView.showNoNotes()
+        else          notesView.showNotes(mutableListOf())
         notesView.showDeleteAllNotes()
     }
 

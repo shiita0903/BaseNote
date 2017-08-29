@@ -38,7 +38,7 @@ interface NotesContract {
 
         fun deleteNote(note: Note)
 
-        fun deleteAllNotes()
+        fun deleteAllNotes(tag: Int)
 
         fun addNewNote()
 

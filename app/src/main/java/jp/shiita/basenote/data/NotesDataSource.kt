@@ -55,6 +55,21 @@ object NotesDataSource {
     }
 
     /**
+     * 特定のタグを持つノートを全て削除する
+     * @param tag 削除するノートのタグ
+     */
+    fun deleteAllNotes(tag: Int) {
+        Realm.getDefaultInstance().use { realm ->
+            realm.executeTransaction {
+                realm.where(Note::class.java)
+                        .equalTo(Note::tag.name, tag)
+                        .findAll()
+                        .forEach { it.deleteFromRealm() }
+            }
+        }
+    }
+
+    /**
      * ノートのIDで検索し、見つかったならばそれを削除する
      * @param noteId ノートのUUID
      */
