@@ -17,6 +17,8 @@ class NotesActivity : AppCompatActivity() {
 
     private lateinit var notesPresenter: NotesPresenter
 
+    var filterTag = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fabric.with(this, Crashlytics())    // Fabricの起動
@@ -56,8 +58,28 @@ class NotesActivity : AppCompatActivity() {
     }
 
     private fun setupDrawerContent(navigationView: NavigationView) {
+        // TODO: アイコン色の変更が上手く出来ない
+        val tags = mapOf(
+                R.id.list_navigation_menu_item_all to 0,
+                R.id.list_navigation_menu_item_red to 1,
+                R.id.list_navigation_menu_item_orange to 2,
+                R.id.list_navigation_menu_item_yellow to 3,
+                R.id.list_navigation_menu_item_green to 4,
+                R.id.list_navigation_menu_item_light_blue to 5,
+                R.id.list_navigation_menu_item_blue to 6,
+                R.id.list_navigation_menu_item_purple to 7,
+                R.id.list_navigation_menu_item_black to 8)
+//        (0 until navigationView.menu.size()).forEach { i ->
+//            val menuItem = navigationView.menu.getItem(i)
+//            val tag = tags[menuItem.itemId]
+//            Log.d("item", menuItem.title.toString())
+//            if (tag != null && tag != 0)
+//                menuItem.icon.setColorFilter(resources.obtainTypedArray(R.array.tag_color).getColor(tag, 0), PorterDuff.Mode.SRC_IN)
+//        }
         navigationView.setNavigationItemSelectedListener { menuItem ->
-            // Close the navigation drawer when an item is selected.
+            filterTag = tags[menuItem.itemId]!!
+            notesPresenter.filterNotes(filterTag)
+            (0 until navigationView.menu.size()).forEach { navigationView.menu.getItem(it).isChecked = false }
             menuItem.isChecked = true
             drawerLayout.closeDrawers()
             true

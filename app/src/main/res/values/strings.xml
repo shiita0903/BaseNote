@@ -21,7 +21,7 @@
 
     <string name="title_hint">Title</string>
     <string name="content_hint">Content</string>
-    <string name="list_title">Note List</string>
+    <string name="list_title">全てのノート</string>
     <string name="no_notes_add">ノート新規作成 ＋</string>
 
     <string name="select_note">ノートの選択</string>
@@ -32,16 +32,26 @@
         <item>追加後ノートを開く</item>
         <item>キャンセル</item>
     </string-array>
+
     <string name="select_tag">タグの選択</string>
+    <string name="tag_none">なし</string>
+    <string name="tag_red">赤</string>
+    <string name="tag_orange">橙</string>
+    <string name="tag_yellow">黄色</string>
+    <string name="tag_green">緑</string>
+    <string name="tag_light_blue">水色</string>
+    <string name="tag_blue">青</string>
+    <string name="tag_purple">紫</string>
+    <string name="tag_black">黒</string>
     <string-array name="tag_color_item">
-        <item>なし</item>
-        <item>赤</item>
-        <item>橙</item>
-        <item>黃色</item>
-        <item>緑</item>
-        <item>水色</item>
-        <item>青</item>
-        <item>紫</item>
-        <item>黒</item>
+        <item>@string/tag_none</item>
+        <item>@string/tag_red</item>
+        <item>@string/tag_orange</item>
+        <item>@string/tag_yellow</item>
+        <item>@string/tag_green</item>
+        <item>@string/tag_light_blue</item>
+        <item>@string/tag_blue</item>
+        <item>@string/tag_purple</item>
+        <item>@string/tag_black</item>
     </string-array>
 </resources>

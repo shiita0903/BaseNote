@@ -135,8 +135,11 @@ class NotesFragment : Fragment(), NotesContract.View {
         }
     }
 
+    override fun filterNotes(tag: Int) = notesAdapter.filter(tag)
+
     override fun showNotes(notes: MutableList<Note>) {
-        notesAdapter.notes = notes
+        notesAdapter.notesCopy = mutableListOf(*notes.toTypedArray())
+        notesAdapter.filter((activity as NotesActivity).filterTag)      // フィルタを書けるのでコピーの方だけ初期化
         notesView.visibility = View.VISIBLE
         noNotesView.visibility = View.GONE
     }
@@ -176,6 +179,8 @@ class NotesFragment : Fragment(), NotesContract.View {
                 field = notes
                 notifyDataSetChanged()
             }
+
+        var notesCopy: MutableList<Note> = mutableListOf(*notes.toTypedArray())
 
         private val inflater = LayoutInflater.from(context)
 
@@ -230,9 +235,18 @@ class NotesFragment : Fragment(), NotesContract.View {
             }
         }
 
+        // 正直あまり綺麗ではないと思う
+        fun filter(tag: Int) {
+            notes.clear()
+            notes = if (tag == 0) mutableListOf(*notesCopy.toTypedArray())
+                    else          notesCopy.filter { it.tag == tag }.toMutableList()
+        }
+
         fun removeItem(position: Int) {
             require(position in 0 until itemCount)
-            notes.removeAt(position)
+            val note = getItem(position)
+            notes.remove(note)
+            notesCopy.remove(note)
             notifyItemRemoved(position)
         }
 

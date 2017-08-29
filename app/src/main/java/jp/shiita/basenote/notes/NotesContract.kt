@@ -9,6 +9,8 @@ interface NotesContract {
 
         fun setLoadingIndicator(active: Boolean)
 
+        fun filterNotes(tag: Int)
+
         fun showNotes(notes: MutableList<Note>)
 
         fun showAddNote()

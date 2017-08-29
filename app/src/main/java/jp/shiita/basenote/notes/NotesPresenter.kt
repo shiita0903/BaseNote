@@ -1,7 +1,5 @@
 package jp.shiita.basenote.notes
 
-import android.app.Activity
-import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.data.NotesDataSource
 
@@ -80,4 +78,9 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
     override fun addNewNote() = notesView.showAddNote()
 
     override fun editNote(requestedNote: Note) = notesView.showEditNoteUi(requestedNote.id)
+
+    // activityから呼ぶ
+    fun filterNotes(tag: Int) {
+        notesView.filterNotes(tag)
+    }
 }
