@@ -13,11 +13,12 @@
     <string name="menu_edit">編集</string>
     <string name="menu_edit_finish">完了</string>
     <string name="menu_refresh">更新</string>
+    <string name="menu_delete">削除</string>
     <string name="menu_delete_all">ノートを全て削除</string>
+    <string name="menu_select_tag">タグをつける</string>
     <string name="menu_search_google">Google</string>
     <string name="menu_search_wikipedia">Wikipedia</string>
     <string name="menu_search_weblio">weblio</string>
-    <string name="note_item_menu_delete">削除</string>
 
     <string name="title_hint">Title</string>
     <string name="content_hint">Content</string>
@@ -32,4 +33,5 @@
         <item>追加後ノートを開く</item>
         <item>キャンセル</item>
     </string-array>
+    <string name="select_tag">タグの選択</string>
 </resources>

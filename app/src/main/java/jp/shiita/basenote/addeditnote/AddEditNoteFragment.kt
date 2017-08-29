@@ -1,6 +1,8 @@
 package jp.shiita.basenote.addeditnote
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
@@ -8,6 +10,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
@@ -37,6 +40,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     private var editMode = true
     private var webMode = false
+
+    private var noteTag = 0
 
     override var isActive: Boolean = false
         get() = isAdded
@@ -156,6 +161,35 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         return root
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_select_tag -> {
+                SelectTagDialogFragment().apply {
+                    setTargetFragment(this@AddEditNoteFragment, SELECT_TAG_REQUEST_CODE)
+                    arguments = Bundle().apply {
+                        putInt(SelectTagDialogFragment.ARGUMENT_TAG, noteTag)
+                    }
+                }.show(fragmentManager, SelectTagDialogFragment.TAG)
+            }
+            R.id.menu_delete -> Log.d("add edit menu", "delete")
+            R.id.home -> activity.finish()
+            else -> return false
+        }
+        return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (resultCode != Activity.RESULT_OK) return
+        when (requestCode) {
+            SELECT_TAG_REQUEST_CODE -> {
+                noteTag = data.getIntExtra(Intent.EXTRA_TEXT, 0)
+                presenter?.updateTag(noteTag)
+            }
+        }
+    }
+
     override fun setTitle(title: String) {
         this.title.text = title
     }
@@ -172,6 +206,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         }
 
         this.content.text = sb
+    }
+
+    override fun setNoteTag(tag: Int) {
+        noteTag = tag
     }
 
     override fun showSaveNote() = content.snackbarLong(getString(R.string.save_note_message))
@@ -209,7 +247,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     private fun saveNote() {
         val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
-        presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
+        presenter?.saveNote(title.text.toString(), content.text.toString(), spanList, noteTag)
     }
 
     // Webページを表示する処理。fabとアクションバーを非表示に
@@ -245,6 +283,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     companion object {
         val ARGUMENT_EDIT_NOTE_ID = "EDIT_NOTE_ID"
+        val SELECT_TAG_REQUEST_CODE = 1
         fun newInstance() = AddEditNoteFragment()
     }
 }

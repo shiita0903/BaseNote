@@ -5,4 +5,17 @@
     <color name="colorAccent">#FF4081</color>
     <color name="separator">#333333</color>
     <drawable name="touchFeedback">#CFD8DC</drawable>
+
+    <array name="tag_color">
+        <item>#000000</item>
+        <item>#ED1A3D</item>
+        <item>#FF5900</item>
+        <item>#FFD400</item>
+        <item>#008000</item>
+        <item>#AFDFE4</item>
+        <item>#0067C0</item>
+        <item>#A757A8</item>
+        <item>#111111</item>
+        <item>#EEEEEE</item>
+    </array>
 </resources>

@@ -25,11 +25,19 @@ class AddEditNotePresenter(
         }
     }
 
-    override fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
+    override fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int) {
         if (noteId == null) {
-            createNote(title, content, urlSpanList)
+            createNote(title, content, urlSpanList, tag)
         } else {
-            updateNote(title, content, urlSpanList)
+            updateNote(title, content, urlSpanList, tag)
+        }
+    }
+
+    override fun updateTag(tag: Int) {
+        if (noteId != null) {
+            val note = NotesDataSource.getNote(noteId!!)?.apply { this.tag = tag }
+            if (note != null)
+                NotesDataSource.updateNote(note)
         }
     }
 
@@ -43,6 +51,7 @@ class AddEditNotePresenter(
                 addEditNoteView.run {
                     setTitle(note.title)
                     setContent(note.content, note.urlSpanList)
+                    setNoteTag(note.tag)
                 }
                 isDataMissing = false
             }
@@ -89,8 +98,8 @@ class AddEditNotePresenter(
         return sb
     }
 
-    private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
-        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()))
+    private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int) {
+        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), tag)
         if (!newNote.isEmpty) {
             noteId = newNote.id     // idを更新しないと、別idで複数保存可能になってしまう
             NotesDataSource.saveNote(newNote)
@@ -98,11 +107,11 @@ class AddEditNotePresenter(
         }
     }
 
-    private fun updateNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
+    private fun updateNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int) {
         if (noteId == null) {
             throw RuntimeException("updateNote() was called but note is new.")
         }
-        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), id = noteId!!)
+        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), tag, id = noteId!!)
         if (newNote.isEmpty)
             NotesDataSource.deleteNote(newNote.id)
         else {

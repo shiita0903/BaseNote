@@ -5,6 +5,7 @@ import io.realm.RealmObject
 import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import jp.shiita.basenote.util.Tag
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,6 +14,7 @@ open class Note(
     open var title: String = "",
     open var content: String = "",
     open var urlSpanList: RealmList<URLSpanData> = RealmList(),
+    open var tag: Int = Tag.NONE.ordinal,
     open var date: Long = Calendar.getInstance().time.time,
     @PrimaryKey open var id: String = UUID.randomUUID().toString()
 ) : RealmObject() {

@@ -18,12 +18,16 @@ interface AddEditNoteContract {
 
         fun switchEditMode(save: Boolean)
 
+        fun setNoteTag(tag: Int)
+
         var isActive: Boolean
     }
 
     interface Presenter : BasePresenter {
 
-        fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>)
+        fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int)
+
+        fun updateTag(tag: Int)
 
         fun populateNote()
 
