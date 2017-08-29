@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import jp.shiita.basenote.R
@@ -166,6 +167,11 @@ class NotesFragment : Fragment(), NotesContract.View {
             if (notes.size > position) {
                 // itemの設定とリスナの登録
                 holder.apply {
+                    if (note.tag == 0) tag.visibility = View.INVISIBLE
+                    else {
+                        tag.visibility = View.VISIBLE
+                        tag.setColorFilter(context.resources.obtainTypedArray(R.array.tag_color).getColor(note.tag, 0))
+                    }
                     title.text = note.titleForList
                     date.text = Note.format.format(Date(note.date))
                     itemView.setOnClickListener {
@@ -189,6 +195,7 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         // ViewHolderに対するクリックリスナはonBindViewHolderで登録
         class ViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+            val tag = itemView.findViewById(R.id.note_item_tag) as ImageView
             val title = itemView.findViewById(R.id.note_item_title) as TextView
             val date = itemView.findViewById(R.id.note_item_date) as TextView
             val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton

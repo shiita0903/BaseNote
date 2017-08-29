@@ -34,4 +34,15 @@
         <item>キャンセル</item>
     </string-array>
     <string name="select_tag">タグの選択</string>
+    <string-array name="tag_color_item">
+        <item>なし</item>
+        <item>赤</item>
+        <item>橙</item>
+        <item>黃色</item>
+        <item>緑</item>
+        <item>水色</item>
+        <item>青</item>
+        <item>紫</item>
+        <item>黒</item>
+    </string-array>
 </resources>

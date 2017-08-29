@@ -10,7 +10,7 @@ import jp.shiita.basenote.R
 
 class SelectTagDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val tags = arrayOf("NONE", "RED", "ORANGE", "YELLOW", "GREEN", "LIGHT_BLUE", "BLUE", "PURPLE", "BLACK", "WHITE")
+        val tags = resources.getStringArray(R.array.tag_color_item)
         var selected = arguments.getInt(ARGUMENT_TAG)
         return AlertDialog.Builder(activity)
                 .setTitle(getString(R.string.select_tag))

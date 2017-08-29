@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_select_tag"
-        compat:showAsAction="withText|never"
+        compat:showAsAction="withText|always"
         android:icon="@drawable/ic_tag"
         android:title="@string/menu_select_tag"/>
 

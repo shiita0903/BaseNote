@@ -3,6 +3,7 @@ package jp.shiita.basenote.addeditnote
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
@@ -178,7 +179,13 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+        inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
+        // タグの色変更
+        if (noteTag != 0)
+            menu?.getItem(0)?.icon?.setColorFilter(resources.obtainTypedArray(R.array.tag_color).getColor(noteTag, 0), PorterDuff.Mode.SRC_IN)
+
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (resultCode != Activity.RESULT_OK) return
@@ -186,6 +193,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             SELECT_TAG_REQUEST_CODE -> {
                 noteTag = data.getIntExtra(Intent.EXTRA_TEXT, 0)
                 presenter?.updateTag(noteTag)
+                activity.invalidateOptionsMenu()    // メニューを読み込み直して、タグの色を反映
             }
         }
     }
