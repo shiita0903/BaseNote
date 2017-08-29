@@ -150,7 +150,9 @@ class NotesFragment : Fragment(), NotesContract.View {
     }
 
     override fun showAddNote() {
-        val intent = Intent(context, AddEditNoteActivity::class.java)
+        val intent = Intent(context, AddEditNoteActivity::class.java).apply {
+            putExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_TAG, (activity as NotesActivity).filterTag)
+        }
         startActivityForResult(intent, AddEditNoteActivity.REQUEST_ADD_NOTE)
     }
 

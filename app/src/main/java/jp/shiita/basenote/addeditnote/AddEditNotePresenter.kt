@@ -10,12 +10,14 @@ import jp.shiita.basenote.util.MyURLSpan
 
 class AddEditNotePresenter(
         private var noteId: String?,
+        defaultTag: Int,
         private val addEditNoteView: AddEditNoteContract.View,
         override var isDataMissing: Boolean
 ) : AddEditNoteContract.Presenter {
 
     init {
         addEditNoteView.presenter = this
+        addEditNoteView.setNoteTag(defaultTag)
     }
 
     override fun start() {

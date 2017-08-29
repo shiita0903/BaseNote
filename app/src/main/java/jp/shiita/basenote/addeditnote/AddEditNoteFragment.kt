@@ -184,7 +184,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         // タグの色変更
         if (noteTag != 0)
             menu?.getItem(0)?.icon?.setColorFilter(resources.obtainTypedArray(R.array.tag_color).getColor(noteTag, 0), PorterDuff.Mode.SRC_IN)
-
+        else
+            menu?.getItem(0)?.icon?.colorFilter = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -291,6 +292,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     companion object {
         val ARGUMENT_EDIT_NOTE_ID = "EDIT_NOTE_ID"
+        val ARGUMENT_EDIT_NOTE_TAG = "EDIT_NOTE_TAG"
         val SELECT_TAG_REQUEST_CODE = 1
         fun newInstance() = AddEditNoteFragment()
     }

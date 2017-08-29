@@ -28,6 +28,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         fabBottom = findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton
 
         val noteId = intent.getStringExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)
+        val noteTag = intent.getIntExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_TAG, 0)
         setToolbarTitle(editMode = true)
         val addEditNoteFragment = getFragment(noteId)
 
@@ -42,6 +43,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         // Create the presenter
         addEditNotePresenter = AddEditNotePresenter(
                 noteId,
+                noteTag,
                 addEditNoteFragment,
                 shouldLoadDataFromRepo)
     }
