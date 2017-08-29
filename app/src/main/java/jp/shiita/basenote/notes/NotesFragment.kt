@@ -1,5 +1,6 @@
 package jp.shiita.basenote.notes
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,6 +18,7 @@ import android.widget.TextView
 import jp.shiita.basenote.R
 import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
+import jp.shiita.basenote.addeditnote.SelectTagDialogFragment
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.util.snackbarLong
 import java.util.*
@@ -35,9 +37,6 @@ class NotesFragment : Fragment(), NotesContract.View {
         presenter?.start()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-        = presenter?.result(requestCode, resultCode) ?: Unit
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.notes_frag, container, false)
 
@@ -51,6 +50,15 @@ class NotesFragment : Fragment(), NotesContract.View {
                         removeItem(position)    // アダプタのノート一覧からも削除する必要がある
                         if (notesAdapter.itemCount == 0)
                             showNoNotes()
+                    }
+                    R.id.note_item_menu_select_tag -> {
+                        SelectTagDialogFragment().apply {
+                            setTargetFragment(this@NotesFragment, SELECT_TAG_REQUEST_CODE)
+                            arguments = Bundle().apply {
+                                putInt(SelectTagDialogFragment.ARGUMENT_TAG, note.tag)
+                                putInt(SelectTagDialogFragment.ARGUMENT_POSITION, position)
+                            }
+                        }.show(fragmentManager, SelectTagDialogFragment.TAG)
                     }
                 }
             }
@@ -96,6 +104,19 @@ class NotesFragment : Fragment(), NotesContract.View {
         return root
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) return
+        when (requestCode) {
+            SELECT_TAG_REQUEST_CODE -> {
+                val position = data!!.getIntExtra(SelectTagDialogFragment.ARGUMENT_POSITION, 0)
+                val tag = data.getIntExtra(SelectTagDialogFragment.ARGUMENT_TAG, 0)
+                val note = notesAdapter.getItem(position).apply { this.tag = tag }  // アダプタ側のタグ更新
+                presenter?.updateNote(note)                                         // DB側のタグ更新
+                notesAdapter.notifyItemChanged(position)                            // 変更の通知
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_refresh -> presenter?.loadNotes(true)
@@ -124,8 +145,6 @@ class NotesFragment : Fragment(), NotesContract.View {
         notesView.visibility = View.GONE
         noNotesView.visibility = View.VISIBLE
     }
-
-    override fun showSuccessfullySavedMessage() = showMessage(getString(R.string.successfully_saved_note_message))
 
     override fun showAddNote() {
         val intent = Intent(context, AddEditNoteActivity::class.java)
@@ -184,6 +203,10 @@ class NotesFragment : Fragment(), NotesContract.View {
                         onClickNoteItemMenu(holder.adapterPosition, R.id.note_item_menu_delete)
                         popup.dismiss()
                     }
+                    popup.contentView.findViewById(R.id.note_item_menu_select_tag).setOnClickListener {
+                        onClickNoteItemMenu(holder.adapterPosition, R.id.note_item_menu_select_tag)
+                        popup.dismiss()
+                    }
                 }
             }
         }
@@ -227,5 +250,6 @@ class NotesFragment : Fragment(), NotesContract.View {
 
     companion object {
         fun newInstance() = NotesFragment()
+        val SELECT_TAG_REQUEST_CODE = 2
     }
 }

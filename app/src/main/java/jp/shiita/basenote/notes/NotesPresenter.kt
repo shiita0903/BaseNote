@@ -17,18 +17,14 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
         loadNotes(false)
     }
 
-    override fun result(requestCode: Int, resultCode: Int) {
-        // If a note was successfully added, show snack bar
-        if (AddEditNoteActivity.REQUEST_ADD_NOTE == requestCode
-                && Activity.RESULT_OK == resultCode) {
-            notesView.showSuccessfullySavedMessage()
-        }
-    }
-
     override fun loadNotes(forceUpdate: Boolean) {
         // Simplification for sample: a network reload will be forced on first load.
         loadNotes(forceUpdate || firstLoad, true)
         firstLoad = false
+    }
+
+    override fun updateNote(note: Note) {
+        NotesDataSource.updateNote(note)
     }
 
     override fun deleteNote(note: Note) {

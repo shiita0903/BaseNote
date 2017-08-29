@@ -187,11 +187,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) return
         when (requestCode) {
             SELECT_TAG_REQUEST_CODE -> {
-                noteTag = data.getIntExtra(Intent.EXTRA_TEXT, 0)
+                noteTag = data?.getIntExtra(SelectTagDialogFragment.ARGUMENT_TAG, 0)!!
                 presenter?.updateTag(noteTag)
                 activity.invalidateOptionsMenu()    // メニューを読み込み直して、タグの色を反映
             }

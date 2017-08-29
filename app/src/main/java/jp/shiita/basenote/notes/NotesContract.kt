@@ -25,16 +25,14 @@ interface NotesContract {
 
         fun showNoNotes()
 
-        fun showSuccessfullySavedMessage()
-
         var isActive: Boolean
     }
 
     interface Presenter : BasePresenter {
 
-        fun result(requestCode: Int, resultCode: Int)
-
         fun loadNotes(forceUpdate: Boolean)
+
+        fun updateNote(note: Note)
 
         fun deleteNote(note: Note)
 

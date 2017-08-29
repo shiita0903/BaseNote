@@ -20,7 +20,9 @@ class SelectTagDialogFragment : DialogFragment() {
                 .setPositiveButton("OK") { _, _ ->
                     if (targetFragment != null) {
                         val data = Intent().apply {
-                            putExtra(Intent.EXTRA_TEXT, selected)
+                            putExtra(ARGUMENT_TAG, selected)
+                            if (arguments.containsKey(ARGUMENT_POSITION))
+                                putExtra(ARGUMENT_POSITION, arguments.getInt(ARGUMENT_POSITION))
                         }
                         targetFragment.onActivityResult(targetRequestCode, Activity.RESULT_OK, data)
                     }
@@ -31,6 +33,7 @@ class SelectTagDialogFragment : DialogFragment() {
 
     companion object {
         val ARGUMENT_TAG = "TAG"
+        val ARGUMENT_POSITION = "POSITION"
         val TAG = SelectTagDialogFragment::class.java.simpleName
     }
 }
