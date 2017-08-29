@@ -14,11 +14,13 @@ interface AddEditNoteContract {
 
         fun setContent(content: String, urlSpanList: List<URLSpanData>)
 
+        fun setNoteTag(tag: Int)
+
         fun showSaveNote()
 
         fun switchEditMode(save: Boolean)
 
-        fun setNoteTag(tag: Int)
+        fun finishActivity()
 
         var isActive: Boolean
     }
@@ -28,6 +30,8 @@ interface AddEditNoteContract {
         fun saveNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int)
 
         fun updateTag(tag: Int)
+
+        fun deleteNote()
 
         fun populateNote()
 

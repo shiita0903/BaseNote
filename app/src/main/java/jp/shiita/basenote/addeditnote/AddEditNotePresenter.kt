@@ -43,6 +43,13 @@ class AddEditNotePresenter(
         }
     }
 
+    override fun deleteNote() {
+        if (noteId != null) {
+            NotesDataSource.deleteNote(noteId!!)
+        }
+        addEditNoteView.finishActivity()
+    }
+
     override fun populateNote() {
         if (noteId == null) {
             throw RuntimeException("populateNote() was called but note is new.")

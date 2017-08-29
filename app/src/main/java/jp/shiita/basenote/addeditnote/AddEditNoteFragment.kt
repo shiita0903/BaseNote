@@ -11,7 +11,6 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
@@ -172,8 +171,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                     }
                 }.show(fragmentManager, SelectTagDialogFragment.TAG)
             }
-            R.id.menu_delete -> Log.d("add edit menu", "delete")
-            R.id.home -> activity.finish()
+            R.id.menu_delete -> presenter?.deleteNote()
+            R.id.home -> finishActivity()
             else -> return false
         }
         return true
@@ -245,6 +244,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
         hideSoftInput()
     }
+
+    override fun finishActivity() = activity.finish()
 
     override fun onURLClick(url: String) {
         if (editMode) return    // 編集中は無効化
