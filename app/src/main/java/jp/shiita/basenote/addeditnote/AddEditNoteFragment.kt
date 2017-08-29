@@ -49,10 +49,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         with(activity.findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton) {
-            setOnClickListener { switchEditMode() }
+            setOnClickListener { switchEditMode(save = true) }
         }
         with(activity.findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton) {
-            setOnClickListener { switchEditMode() }
+            setOnClickListener { switchEditMode(save = true) }
         }
     }
 
@@ -154,8 +154,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         return root
     }
 
-    override fun showEmptyNoteError() = title.snackbarLong(getString(R.string.empty_note_message))
-
     override fun setTitle(title: String) {
         this.title.text = title
     }
@@ -176,7 +174,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         this.content.text = sb
     }
 
-    override fun switchEditMode() {
+    override fun showSaveNote() = content.snackbarLong(getString(R.string.save_note_message))
+
+    override fun switchEditMode(save: Boolean) {
         editMode = !editMode
 
         // フォーカスが与えられるかどうかで、編集の可否を制御
@@ -191,8 +191,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             !editMode -> {
                 act.setFabIconResource(R.drawable.ic_edit)
                 // 編集モードから抜けた時に保存処理をする
-                val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
-                presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
+                if (save) saveNote()
             }
         }
         act.setToolbarTitle(editMode)
@@ -206,6 +205,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         webView.loadUrl(url)
         webFrameLayout.visibility = View.VISIBLE
         closeWebViewButton.visibility = View.VISIBLE
+    }
+
+    private fun saveNote() {
+        val spanList = presenter?.getURLSpanDataList(content.text as Spannable) ?: emptyList()
+        presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
     }
 
     // Webページを表示する処理。fabとアクションバーを非表示に

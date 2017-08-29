@@ -131,7 +131,7 @@ class NotesFragment : Fragment(), NotesContract.View {
         startActivityForResult(intent, AddEditNoteActivity.REQUEST_ADD_NOTE)
     }
 
-    override fun showDeleteNote(title: String) = showMessage(getString(R.string.note_item_delete_message, title))
+    override fun showDeleteNote(title: String) = showMessage(getString(R.string.delete_note_message, title))
 
     override fun showDeleteAllNotes() = showMessage(getString(R.string.all_notes_deleted_message))
 
@@ -166,7 +166,7 @@ class NotesFragment : Fragment(), NotesContract.View {
             if (notes.size > position) {
                 // itemの設定とリスナの登録
                 holder.apply {
-                    title.text = note.titleForList.trimStart()
+                    title.text = note.titleForList
                     date.text = Note.format.format(Date(note.date))
                     itemView.setOnClickListener {
                         onClickNoteItem(holder.adapterPosition)

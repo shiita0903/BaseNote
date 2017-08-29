@@ -8,7 +8,7 @@ import jp.shiita.basenote.data.URLSpanData
 import jp.shiita.basenote.util.MyURLSpan
 
 class AddEditNotePresenter(
-        private val noteId: String?,
+        private var noteId: String?,
         private val addEditNoteView: AddEditNoteContract.View,
         override var isDataMissing: Boolean
 ) : AddEditNoteContract.Presenter {
@@ -20,7 +20,7 @@ class AddEditNotePresenter(
     override fun start() {
         if (noteId != null && isDataMissing) {
             populateNote()
-            addEditNoteView.switchEditMode()
+            addEditNoteView.switchEditMode(save = false)
         }
     }
 
@@ -36,7 +36,7 @@ class AddEditNotePresenter(
         if (noteId == null) {
             throw RuntimeException("populateNote() was called but note is new.")
         }
-        val note = NotesDataSource.getNote(noteId)
+        val note = NotesDataSource.getNote(noteId!!)
         if (addEditNoteView.isActive) {
             if (note != null) {
                 addEditNoteView.run {
@@ -73,10 +73,10 @@ class AddEditNotePresenter(
 
     private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
         val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()))
-        if (newNote.isEmpty) {
-            addEditNoteView.showEmptyNoteError()
-        } else {
+        if (!newNote.isEmpty) {
+            noteId = newNote.id     // idを更新しないと、別idで複数保存可能になってしまう
             NotesDataSource.saveNote(newNote)
+            addEditNoteView.showSaveNote()
         }
     }
 
@@ -84,6 +84,12 @@ class AddEditNotePresenter(
         if (noteId == null) {
             throw RuntimeException("updateNote() was called but note is new.")
         }
-        NotesDataSource.updateNote(Note(title, content, RealmList(*urlSpanList.toTypedArray()), id = noteId))
+        val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), id = noteId!!)
+        if (newNote.isEmpty)
+            NotesDataSource.deleteNote(newNote.id)
+        else {
+            NotesDataSource.updateNote(newNote)
+            addEditNoteView.showSaveNote()
+        }
     }
 }

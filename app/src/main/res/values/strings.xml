@@ -7,7 +7,8 @@
     <string name="loading_notes_error">ノート読み込み中にエラーが発生しました</string>
     <string name="all_notes_deleted_message">全てのノートを削除しました</string>
     <string name="successfully_saved_note_message">Note saved</string>
-    <string name="note_item_delete_message">「%1$s」を削除しました</string>
+    <string name="save_note_message">保存完了</string>
+    <string name="delete_note_message">「%1$s」を削除しました</string>
 
     <string name="menu_edit">編集</string>
     <string name="menu_edit_finish">完了</string>
@@ -24,7 +25,6 @@
     <string name="no_notes_add">ノート新規作成 ＋</string>
 
     <string name="select_note">ノートの選択</string>
-    <string name="empty_note_message">空のノートは作成できません</string>
     <string-array name="text_share_item">
         <item>新しくノートを作成する</item>
         <item>既存のノートに追加する</item>

@@ -10,13 +10,13 @@ interface AddEditNoteContract {
 
     interface View : BaseView<Presenter> {
 
-        fun showEmptyNoteError()
-
         fun setTitle(title: String)
 
         fun setContent(content: String, urlSpanList: List<URLSpanData>)
 
-        fun switchEditMode()
+        fun showSaveNote()
+
+        fun switchEditMode(save: Boolean)
 
         var isActive: Boolean
     }

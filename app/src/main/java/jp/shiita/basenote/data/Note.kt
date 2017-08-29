@@ -17,7 +17,7 @@ open class Note(
     @PrimaryKey open var id: String = UUID.randomUUID().toString()
 ) : RealmObject() {
     val titleForList: String
-        get() = if (title.isEmpty()) content else title
+        get() = if (title.isEmpty()) content.trim() else title.trim()
 
     val isEmpty: Boolean
         get() = title.isEmpty() && content.isEmpty()
