@@ -98,7 +98,7 @@ class NotesFragment : Fragment(), NotesContract.View {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_refresh -> presenter?.loadNotes(true)
-            R.id.menu_clear -> presenter?.deleteAllNotes()
+            R.id.menu_delete_all -> presenter?.deleteAllNotes()
         }
         return true
     }
@@ -133,7 +133,7 @@ class NotesFragment : Fragment(), NotesContract.View {
 
     override fun showDeleteNote(title: String) = showMessage(getString(R.string.note_item_delete_message, title))
 
-    override fun showDeleteAllNotes() = showMessage(getString(R.string.all_notes_deleted))
+    override fun showDeleteAllNotes() = showMessage(getString(R.string.all_notes_deleted_message))
 
     override fun showEditNoteUi(noteId: String) {
         val intent = Intent(context, AddEditNoteActivity::class.java).apply {

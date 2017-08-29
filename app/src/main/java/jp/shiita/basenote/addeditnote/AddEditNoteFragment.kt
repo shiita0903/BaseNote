@@ -195,6 +195,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 presenter?.saveNote(title.text.toString(), content.text.toString(), spanList)
             }
         }
+        act.setToolbarTitle(editMode)
 
         hideSoftInput()
     }

@@ -28,7 +28,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         fabBottom = findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton
 
         val noteId = intent.getStringExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)
-        setToolbarTitle(noteId)
+        setToolbarTitle(editMode = true)
         val addEditNoteFragment = getFragment(noteId)
 
         var shouldLoadDataFromRepo = true
@@ -46,16 +46,6 @@ class AddEditNoteActivity : AppCompatActivity() {
                 shouldLoadDataFromRepo)
     }
 
-    private fun setToolbarTitle(noteId: String?) {
-        supportActionBar?.let {
-            if (noteId == null) {
-                it.setTitle(R.string.add_note)
-            } else {
-                it.setTitle(R.string.edit_note)
-            }
-        }
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         // Save the state so that next time we know if we need to refresh data.
         outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, addEditNotePresenter.isDataMissing)
@@ -65,6 +55,15 @@ class AddEditNoteActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    fun setToolbarTitle(editMode: Boolean) {
+        supportActionBar?.let {
+            if (editMode)
+                it.setTitle(R.string.edit_note)
+            else
+                it.setTitle(R.string.read_note)
+        }
     }
 
     fun showTopFab() {

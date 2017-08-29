@@ -30,14 +30,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/no_notes_main"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/no_notes_all"
-                android:layout_marginBottom="@dimen/list_item_padding" />
-
-            <TextView
                 android:id="@+id/no_notes_add"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
