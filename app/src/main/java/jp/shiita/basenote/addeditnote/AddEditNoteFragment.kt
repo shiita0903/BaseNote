@@ -103,6 +103,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             }
         }
 
+        // タップ時の処理をONにする
+        content.movementMethod = LinkMovementMethod.getInstance()
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 var start = 0
@@ -124,7 +126,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                             val span = MyURLSpan(urlStr).apply {
                                 setOnURLClickListener(this@AddEditNoteFragment)
                             }
-                            presenter?.addMyURLSpanToContent(content.text as Spannable, span, start, end)
+                            content.text = presenter?.addMyURLSpanToContent(content.text as Spannable, span, start, end)
                             webView.loadUrl(urlStr)
                         }
                         return true
@@ -169,8 +171,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             sb.setSpan(span, urlSpan.start, urlSpan.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        // タップ時の処理をONにする
-        this.content.movementMethod = LinkMovementMethod.getInstance()
         this.content.text = sb
     }
 

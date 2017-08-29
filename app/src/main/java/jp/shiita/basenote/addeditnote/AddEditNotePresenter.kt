@@ -1,6 +1,7 @@
 package jp.shiita.basenote.addeditnote
 
 import android.text.Spannable
+import android.text.SpannableStringBuilder
 import io.realm.RealmList
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.data.NotesDataSource
@@ -62,13 +63,30 @@ class AddEditNotePresenter(
                 ?: emptyList()
     }
 
-    override fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int) {
+    override fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable {
+        val spans = spannable.getSpans(0, spannable.length, MyURLSpan::class.java)
+
         // 新しいspanに被っているspanだけをフィルタして削除
-        spannable.getSpans(0, spannable.length, MyURLSpan::class.java)
-                // ２つのspanの間が一文字空いていればフィルターされない
-                .filterNot { start > spannable.getSpanEnd(it) || end < spannable.getSpanStart(it) }
+        spans.filterNot { start >= spannable.getSpanEnd(it) || end <= spannable.getSpanStart(it) }
                 .forEach { spannable.removeSpan(it) }
-        spannable.setSpan(urlSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        // spanが隣接する場合には空白を挿入
+        val insertStart = spans.any{ start == spannable.getSpanEnd(it) }
+        val insertEnd = spans.any{ end == spannable.getSpanStart(it) }
+        var s = start
+        var e = end
+        val sb = SpannableStringBuilder(spannable)
+        if (insertStart) {
+            sb.insert(s, " ")
+            s++
+            e++
+        }
+        if (insertEnd) {
+            sb.insert(e, " ")
+        }
+        sb.setSpan(urlSpan, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        return sb
     }
 
     private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>) {
