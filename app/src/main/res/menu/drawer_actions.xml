@@ -6,34 +6,34 @@
         android:title="@string/list_title" />
     <item
         android:id="@+id/list_navigation_menu_item_red"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_red"
         android:title="@string/tag_red" />
     <item
         android:id="@+id/list_navigation_menu_item_orange"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_orange"
         android:title="@string/tag_orange" />
     <item
         android:id="@+id/list_navigation_menu_item_yellow"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_yellow"
         android:title="@string/tag_yellow" />
     <item
         android:id="@+id/list_navigation_menu_item_green"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_green"
         android:title="@string/tag_green" />
     <item
         android:id="@+id/list_navigation_menu_item_light_blue"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_light_blue"
         android:title="@string/tag_light_blue" />
     <item
         android:id="@+id/list_navigation_menu_item_blue"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_blue"
         android:title="@string/tag_blue" />
     <item
         android:id="@+id/list_navigation_menu_item_purple"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_purple"
         android:title="@string/tag_purple" />
     <item
         android:id="@+id/list_navigation_menu_item_black"
-        android:icon="@drawable/ic_tag"
+        android:icon="@drawable/ic_tag_black"
         android:title="@string/tag_black" />
 </menu>

@@ -58,7 +58,6 @@ class NotesActivity : AppCompatActivity() {
     }
 
     private fun setupDrawerContent(navigationView: NavigationView) {
-        // TODO: アイコン色の変更が上手く出来ない
         val tags = mapOf(
                 R.id.list_navigation_menu_item_all to 0,
                 R.id.list_navigation_menu_item_red to 1,
@@ -69,13 +68,8 @@ class NotesActivity : AppCompatActivity() {
                 R.id.list_navigation_menu_item_blue to 6,
                 R.id.list_navigation_menu_item_purple to 7,
                 R.id.list_navigation_menu_item_black to 8)
-//        (0 until navigationView.menu.size()).forEach { i ->
-//            val menuItem = navigationView.menu.getItem(i)
-//            val tag = tags[menuItem.itemId]
-//            Log.d("item", menuItem.title.toString())
-//            if (tag != null && tag != 0)
-//                menuItem.icon.setColorFilter(resources.obtainTypedArray(R.array.tag_color).getColor(tag, 0), PorterDuff.Mode.SRC_IN)
-//        }
+
+        navigationView.itemIconTintList = null  // アイコンの色が表示されるように
         navigationView.setNavigationItemSelectedListener { menuItem ->
             filterTag = tags[menuItem.itemId]!!
             notesPresenter.filterNotes(filterTag)

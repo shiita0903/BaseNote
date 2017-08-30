@@ -6,15 +6,24 @@
     <color name="separator">#333333</color>
     <drawable name="touchFeedback">#CFD8DC</drawable>
 
+    <color name="tag_white">#FFFFFF</color>
+    <color name="tag_red">#ED1A3D</color>
+    <color name="tag_orange">#FF5900</color>
+    <color name="tag_yellow">#FFD400</color>
+    <color name="tag_green">#008000</color>
+    <color name="tag_light_blue">#AFDFE4</color>
+    <color name="tag_blue">#0067C0</color>
+    <color name="tag_purple">#A757A8</color>
+    <color name="tag_black">#111111</color>
     <array name="tag_color">
-        <item>#FFFFFF</item>
-        <item>#ED1A3D</item>
-        <item>#FF5900</item>
-        <item>#FFD400</item>
-        <item>#008000</item>
-        <item>#AFDFE4</item>
-        <item>#0067C0</item>
-        <item>#A757A8</item>
-        <item>#111111</item>
+        <item>@color/tag_white</item>
+        <item>@color/tag_red</item>
+        <item>@color/tag_orange</item>
+        <item>@color/tag_yellow</item>
+        <item>@color/tag_green</item>
+        <item>@color/tag_light_blue</item>
+        <item>@color/tag_blue</item>
+        <item>@color/tag_purple</item>
+        <item>@color/tag_black</item>
     </array>
 </resources>
