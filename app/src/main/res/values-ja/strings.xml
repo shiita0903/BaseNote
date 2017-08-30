@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">BaseNote</string>
+    <string name="read_note">閲覧中</string>
+    <string name="edit_note">編集中…</string>
+
+    <string name="no_notes_error">ノートはありません</string>
+    <string name="loading_notes_error">ノート読み込み中にエラーが発生しました</string>
+    <string name="all_notes_deleted_message">全てのノートを削除しました</string>
+    <string name="save_note_message">保存完了</string>
+    <string name="delete_note_message">「%1$s」を削除しました</string>
+
+    <string name="menu_edit">編集</string>
+    <string name="menu_edit_finish">完了</string>
+    <string name="menu_refresh">更新</string>
+    <string name="menu_delete">削除</string>
+    <string name="menu_delete_all">ノートを全て削除</string>
+    <string name="menu_select_tag">タグをつける</string>
+    <string name="menu_search_google">Google</string>
+    <string name="menu_search_wikipedia">Wikipedia</string>
+    <string name="menu_search_weblio">weblio</string>
+
+    <string name="title_hint">Title</string>
+    <string name="content_hint">Content</string>
+    <string name="list_title">全てのノート</string>
+    <string name="no_notes_add">ノート新規作成 ＋</string>
+
+    <string name="select_note">ノートの選択</string>
+    <string-array name="text_share_item">
+        <item>新しくノートを作成する</item>
+        <item>既存のノートに追加する</item>
+        <item>作成後ノートを開く</item>
+        <item>追加後ノートを開く</item>
+        <item>キャンセル</item>
+    </string-array>
+
+    <string name="select_tag">タグの選択</string>
+    <string name="tag_none">なし</string>
+    <string name="tag_red">赤</string>
+    <string name="tag_orange">橙</string>
+    <string name="tag_yellow">黄色</string>
+    <string name="tag_green">緑</string>
+    <string name="tag_light_blue">水色</string>
+    <string name="tag_blue">青</string>
+    <string name="tag_purple">紫</string>
+    <string name="tag_black">黒</string>
+    <string-array name="tag_color_item">
+        <item>@string/tag_none</item>
+        <item>@string/tag_red</item>
+        <item>@string/tag_orange</item>
+        <item>@string/tag_yellow</item>
+        <item>@string/tag_green</item>
+        <item>@string/tag_light_blue</item>
+        <item>@string/tag_blue</item>
+        <item>@string/tag_purple</item>
+        <item>@string/tag_black</item>
+    </string-array>
+</resources>
