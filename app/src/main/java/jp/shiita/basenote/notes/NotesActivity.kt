@@ -75,6 +75,10 @@ class NotesActivity : AppCompatActivity() {
             notesPresenter.filterNotes(filterTag)
             (0 until navigationView.menu.size()).forEach { navigationView.menu.getItem(it).isChecked = false }
             menuItem.isChecked = true
+            val title = getString(R.string.app_name) +
+                    if (filterTag != 0) " [" + resources.getStringArray(R.array.tag_color_item)[filterTag] + "]"
+                    else ""
+            supportActionBar?.title = title
             drawerLayout.closeDrawers()
             true
         }
