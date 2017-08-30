@@ -42,14 +42,45 @@
             </LinearLayout>
         </ScrollView>
 
-        <ImageButton
-            android:id="@+id/close_web_view_button"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="end|bottom"
-            android:background="@null"
-            android:src="@drawable/ic_close"
-            android:visibility="gone"/>
+        <LinearLayout
+            android:id="@+id/add_edit_note_web_view_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/back_web_view_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="start|bottom"
+                android:background="@null"
+                android:src="@drawable/ic_back"/>
+
+            <ImageButton
+                android:id="@+id/forward_web_view_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end|bottom"
+                android:background="@null"
+                android:src="@drawable/ic_forward"/>
+
+            <!-- 空白　-->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="invisible"/>
+
+            <ImageButton
+                android:id="@+id/close_web_view_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity=""
+                android:background="@null"
+                android:src="@drawable/ic_close"/>
+        </LinearLayout>
     </FrameLayout>
 
     <FrameLayout

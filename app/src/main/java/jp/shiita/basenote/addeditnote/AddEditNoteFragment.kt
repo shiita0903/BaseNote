@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.TextView
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.URLSpanData
@@ -34,7 +33,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     private lateinit var webView: WebView
     private var webViewX = 0
 
-    private lateinit var closeWebViewButton: ImageButton
+    private lateinit var webViewBar: View
 
     private lateinit var webFrameLayout: FrameLayout
 
@@ -103,9 +102,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            closeWebViewButton = (findViewById(R.id.close_web_view_button) as ImageButton).apply {
-                setOnClickListener { stopWebMode() }
-            }
+            webViewBar = findViewById(R.id.add_edit_note_web_view_bar)
+            findViewById(R.id.back_web_view_button).setOnClickListener { webView.goBack() }
+            findViewById(R.id.forward_web_view_button).setOnClickListener { webView.goForward() }
+            findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
+            findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
         }
 
         // タップ時の処理をONにする
@@ -252,7 +253,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         startWebMode()
         webView.loadUrl(url)
         webFrameLayout.visibility = View.VISIBLE
-        closeWebViewButton.visibility = View.VISIBLE
+        webViewBar.visibility = View.VISIBLE
     }
 
     private fun saveNote() {
@@ -264,7 +265,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     private fun startWebMode() {
         hideSoftInput()
         webFrameLayout.visibility = View.VISIBLE
-        closeWebViewButton.visibility = View.VISIBLE
+        webViewBar.visibility = View.VISIBLE
         (activity as AddEditNoteActivity).apply {
             showTopFab()
             supportActionBar?.hide()
@@ -281,7 +282,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
         webFrameLayout.visibility = View.GONE
-        closeWebViewButton.visibility = View.GONE
+        webViewBar.visibility = View.GONE
         webMode = false
     }
 
