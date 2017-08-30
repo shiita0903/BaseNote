@@ -1,10 +1,16 @@
 package jp.shiita.basenote.addeditnote
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import jp.shiita.basenote.R
 import jp.shiita.basenote.util.addFragmentToActivity
 
@@ -69,18 +75,58 @@ class AddEditNoteActivity : AppCompatActivity() {
     }
 
     fun showTopFab() {
-        fabTop.visibility = View.VISIBLE
-        fabBottom.visibility = View.GONE
+        startScaleAnim(visible = fabTop, gone = fabBottom)
     }
 
     fun showBottomFab() {
-        fabBottom.visibility = View.VISIBLE
-        fabTop.visibility = View.GONE
+        startScaleAnim(visible = fabBottom, gone = fabTop)
     }
 
     fun setFabIconResource(id: Int) {
         fabTop.setImageResource(id)
         fabBottom.setImageResource(id)
+    }
+
+    private fun startScaleAnim(visible: View, gone: View) {
+        if (visible.visibility == View.VISIBLE) return
+
+        // fabを消すアニメーション
+        val smallAnim = getScaleAnim(gone, 500, toSmall = true).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    gone.visibility = View.GONE
+                }
+            })
+        }
+        // fabを出現させるアニメーション
+        val largeAnim = getScaleAnim(visible, 500, toSmall = false).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    visible.apply {
+                        visibility = View.VISIBLE
+                        scaleX = 0.1f
+                        scaleY = 0.1f
+                    }
+                }
+            })
+        }
+
+        AnimatorSet().apply {
+            playSequentially(smallAnim, largeAnim)  // 前のアニメーションが終了してから順に実行
+            start()
+        }
+    }
+
+    private fun getScaleAnim(view: View, duration: Long, toSmall: Boolean): AnimatorSet {
+        val start = if (toSmall) 1f else 0.1f
+        val end   = if (toSmall) 0.1f else 1f
+        val anim1 = ObjectAnimator.ofFloat(view, "scaleX", start, end)
+        val anim2 = ObjectAnimator.ofFloat(view, "scaleY", start, end)
+        return AnimatorSet().apply {
+            this.duration = duration
+            interpolator = if (toSmall) AccelerateInterpolator() else DecelerateInterpolator()
+            playTogether(anim1, anim2)
+        }
     }
 
     private fun getFragment(noteId: String?): AddEditNoteFragment  {
