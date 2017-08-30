@@ -138,8 +138,8 @@ class NotesFragment : Fragment(), NotesContract.View {
     override fun filterNotes(tag: Int) = notesAdapter.filter(tag)
 
     override fun showNotes(notes: MutableList<Note>) {
-        notesAdapter.notesCopy = mutableListOf(*notes.toTypedArray())
-        notesAdapter.filter((activity as NotesActivity).filterTag)      // フィルタを書けるのでコピーの方だけ初期化
+        notesAdapter.notes = notes
+        filterNotes((activity as NotesActivity).filterTag)      // 初期化時には必ずフィルターをかける
         notesView.visibility = View.VISIBLE
         noNotesView.visibility = View.GONE
     }
@@ -179,10 +179,12 @@ class NotesFragment : Fragment(), NotesContract.View {
         var notes: MutableList<Note> = notes
             set(notes) {
                 field = notes
+                notesCopy.clear()
+                notesCopy.addAll(notes)   // 要素は同じ別のリスト作成
                 notifyDataSetChanged()
             }
 
-        var notesCopy: MutableList<Note> = mutableListOf(*notes.toTypedArray())
+        private var notesCopy: MutableList<Note> = mutableListOf()  // notesの一時退避場所
 
         private val inflater = LayoutInflater.from(context)
 
@@ -239,9 +241,12 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         // 正直あまり綺麗ではないと思う
         fun filter(tag: Int) {
-            notes.clear()
-            notes = if (tag == 0) mutableListOf(*notesCopy.toTypedArray())
-                    else          notesCopy.filter { it.tag == tag }.toMutableList()
+            notes.run {
+                clear()
+                if (tag == 0) addAll(notesCopy)                             // 全てのタグ
+                else          addAll(notesCopy.filter { it.tag == tag })    // 選択したタグのみ
+            }
+            notifyDataSetChanged()
         }
 
         fun removeItem(position: Int) {

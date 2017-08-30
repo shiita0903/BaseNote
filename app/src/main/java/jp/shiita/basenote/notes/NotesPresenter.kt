@@ -43,7 +43,7 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
             return
         }
         if (tag == 0) notesView.showNoNotes()
-        else          notesView.showNotes(mutableListOf())
+        else          notesView.showNotes(NotesDataSource.getNotes().toMutableList())
         notesView.showDeleteAllNotes()
     }
 
