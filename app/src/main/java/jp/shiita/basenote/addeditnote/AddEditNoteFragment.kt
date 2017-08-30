@@ -116,8 +116,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 var end = content.text.length
 
                 if (content.isFocused) {
-                    start = content.selectionStart
-                    end = content.selectionEnd
+                    start = Math.max(content.selectionStart, start) // 最小値は0
+                    end = Math.min(content.selectionEnd, end)       // 最大値はcontent.text.length
                 }
 
                 val word = content.text.subSequence(start, end).toString()
