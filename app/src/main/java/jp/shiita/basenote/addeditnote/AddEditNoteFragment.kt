@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.TextView
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.URLSpanData
@@ -30,12 +31,13 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     private lateinit var content: TextView
 
+    private lateinit var webFrameLayout: FrameLayout
     private lateinit var webView: WebView
     private var webViewX = 0
 
     private lateinit var webViewBar: View
-
-    private lateinit var webFrameLayout: FrameLayout
+    private lateinit var goForward: ImageButton
+    private lateinit var goBack: ImageButton
 
     private var editMode = true
     private var webMode = false
@@ -91,6 +93,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
                 setWebViewClient(object : WebViewClient() {
                     override fun onPageFinished(view: WebView, url: String) {
+                        if (canGoBack()) goBack.visibility = View.VISIBLE
+                        else             goBack.visibility = View.INVISIBLE
+                        if (canGoForward()) goForward.visibility = View.VISIBLE
+                        else                goForward.visibility = View.INVISIBLE
                         super.onPageFinished(view, url)
                     }
                 })
@@ -103,9 +109,12 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
             webViewBar = findViewById(R.id.add_edit_note_web_view_bar)
-            findViewById(R.id.back_web_view_button).setOnClickListener { webView.goBack() }
-            findViewById(R.id.forward_web_view_button).setOnClickListener { webView.goForward() }
-            findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
+            goBack = (findViewById(R.id.back_web_view_button) as ImageButton).apply {
+                setOnClickListener { webView.goBack() }
+            }
+            goForward = (findViewById(R.id.forward_web_view_button) as ImageButton).apply {
+                setOnClickListener { webView.goForward() }
+            }
             findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
         }
 
