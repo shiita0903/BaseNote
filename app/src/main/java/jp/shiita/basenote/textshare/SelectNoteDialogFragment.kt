@@ -1,9 +1,10 @@
 package jp.shiita.basenote.textshare
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.app.DialogFragment
+import android.content.DialogInterface
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
+import android.support.v7.app.AlertDialog
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.data.NotesDataSource
@@ -35,6 +36,11 @@ class SelectNoteDialogFragment : DialogFragment() {
                     (activity as TextShareActivity).finishTextShareActivity(startApp)
                 }
                 .create()
+    }
+
+    override fun onCancel(dialog: DialogInterface?) {
+        (activity as TextShareActivity).finishTextShareActivity(startApp = false)
+        super.onCancel(dialog)
     }
 
     /**

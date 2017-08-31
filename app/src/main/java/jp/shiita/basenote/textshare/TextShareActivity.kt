@@ -1,14 +1,15 @@
 package jp.shiita.basenote.textshare
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.view.View
 import jp.shiita.basenote.notes.NotesActivity
 
-class TextShareActivity : Activity() {
-    // 透明背景のstyle(タイトルバーを消している)のため、Activityを継承する必要がある
+class TextShareActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        transparent()
         val action = intent.action
         val type = intent.type
         val text = intent.getStringExtra(Intent.EXTRA_TEXT)
@@ -17,7 +18,7 @@ class TextShareActivity : Activity() {
                 arguments = Bundle().apply {
                     putString(ShareMenuDialogFragment.ARGUMENT_SHARE_TEXT, text)
                 }
-            }.show(fragmentManager, ShareMenuDialogFragment.TAG)
+            }.show(supportFragmentManager, ShareMenuDialogFragment.TAG)
         }
     }
 
@@ -28,5 +29,9 @@ class TextShareActivity : Activity() {
         if (startApp)
             startActivity(Intent(this, NotesActivity::class.java))
         finish()
+    }
+
+    fun transparent() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
     }
 }

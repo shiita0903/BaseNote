@@ -23,7 +23,7 @@
         <activity android:name=".addeditnote.AddEditNoteActivity"/>
         <activity
             android:name=".textshare.TextShareActivity"
-            android:theme="@style/Theme.TranslucentBackground">
+            android:theme="@style/TranslucentTheme">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>

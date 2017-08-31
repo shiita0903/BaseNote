@@ -1,9 +1,10 @@
 package jp.shiita.basenote.textshare
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.app.DialogFragment
+import android.content.DialogInterface
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
+import android.support.v7.app.AlertDialog
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.data.NotesDataSource
@@ -16,7 +17,7 @@ class ShareMenuDialogFragment : DialogFragment() {
         var startApp = false
         return AlertDialog.Builder(activity)
                 .setTitle("「$text」")
-                .setItems(items) { dialog, which ->
+                .setItems(items) { _, which ->
                     when (which) {
                         0 -> saveNote(text)     // 新規作成
                         1 -> {                  // 既存のノートに追加
@@ -34,11 +35,15 @@ class ShareMenuDialogFragment : DialogFragment() {
                         }
                         4 -> {}                 // キャンセル
                     }
-                    dialog.cancel()
                     if (finish)
                         (activity as TextShareActivity).finishTextShareActivity(startApp)
                 }
                 .create()
+    }
+
+    override fun onCancel(dialog: DialogInterface?) {
+        (activity as TextShareActivity).finishTextShareActivity(startApp = false)
+        super.onCancel(dialog)
     }
 
     private fun saveNote(text: String) = NotesDataSource.saveNote(Note("", text))
@@ -49,7 +54,7 @@ class ShareMenuDialogFragment : DialogFragment() {
                 putString(SelectNoteDialogFragment.ARGUMENT_APPEND_TEXT, text)
                 putBoolean(SelectNoteDialogFragment.ARGUMENT_START_APP, startApp)
             }
-        }.show(fragmentManager, SelectNoteDialogFragment.TAG)
+        }.show(activity.supportFragmentManager, SelectNoteDialogFragment.TAG)
     }
 
     companion object {
