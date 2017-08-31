@@ -54,4 +54,6 @@
         <item>@string/tag_purple</item>
         <item>@string/tag_black</item>
     </string-array>
+    <!-- TODO: あとでアプリIDに変更する -->
+    <string name="admob_app_id">pub-5746085230536493</string>
 </resources>

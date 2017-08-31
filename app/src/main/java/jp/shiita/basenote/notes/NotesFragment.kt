@@ -186,56 +186,42 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         private var notesCopy: MutableList<Note> = mutableListOf()  // notesの一時退避場所
 
+        private val interval = 2
+
+        private var tagNow = 0
+
         private val inflater = LayoutInflater.from(context)
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (holder !is ViewHolder) return   // スマートキャスト
-
-            val note = notes[position]
-            if (notes.size > position) {
-                // itemの設定とリスナの登録
-                holder.apply {
-                    if (note.tag == 0) tag.visibility = View.INVISIBLE
-                    else {
-                        tag.visibility = View.VISIBLE
-                        tag.setColorFilter(context.resources.obtainTypedArray(R.array.tag_color).getColor(note.tag, 0))
-                    }
-                    title.text = note.titleForList
-                    date.text = Note.format.format(Date(note.date))
-                    itemView.setOnClickListener {
-                        onClickNoteItem(holder.adapterPosition)
-                    }
-                    menu.setOnClickListener {
-                        popup.showAsDropDown(menu, menu.width, -menu.height)    // ポップアップメニューの表示
-                    }
-                    popup.contentView.findViewById(R.id.note_item_menu_delete).setOnClickListener {
-                        onClickNoteItemMenu(holder.adapterPosition, R.id.note_item_menu_delete)
-                        popup.dismiss()
-                    }
-                    popup.contentView.findViewById(R.id.note_item_menu_select_tag).setOnClickListener {
-                        onClickNoteItemMenu(holder.adapterPosition, R.id.note_item_menu_select_tag)
-                        popup.dismiss()
+            when (holder) {
+                is NoteViewHolder -> {
+                    if (notes.size > position) {
+                        val note = notes[position]
+                        holder.onBindViewHolder(note, onClickNoteItem, onClickNoteItemMenu)
                     }
                 }
+                is AdViewHolder -> {
+                    holder.onBindViewHolder(position)
+                }
+                else -> error("定義されていないViewHolderです")
             }
         }
 
         override fun getItemCount(): Int = notes.size
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder
-            = ViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
+            return when (viewType) {
+                0 -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
+                1 -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false), context)
+                else -> error("viewTypeが正しくありません")
+            }
+        }
 
-        // ViewHolderに対するクリックリスナはonBindViewHolderで登録
-        class ViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
-            val tag = itemView.findViewById(R.id.note_item_tag) as ImageView
-            val title = itemView.findViewById(R.id.note_item_title) as TextView
-            val date = itemView.findViewById(R.id.note_item_date) as TextView
-            val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton
-            val popup = PopupWindow(context).apply {
-                contentView = LayoutInflater.from(context).inflate(R.layout.note_menu, null)
-                isOutsideTouchable = true
-                isFocusable = true
-                isTouchable = true
+        override fun getItemViewType(position: Int): Int = if (position % (interval + 1) == interval) 1 else 0
+
+        fun insertDummyNote() {
+            for (i in (itemCount - 1) / interval downTo 1) {
+                notes.add(i* interval, Note())
             }
         }
 
@@ -246,7 +232,9 @@ class NotesFragment : Fragment(), NotesContract.View {
                 if (tag == 0) addAll(notesCopy)                             // 全てのタグ
                 else          addAll(notesCopy.filter { it.tag == tag })    // 選択したタグのみ
             }
+            insertDummyNote()
             notifyDataSetChanged()
+            tagNow = tag
         }
 
         fun removeItem(position: Int) {
@@ -254,7 +242,8 @@ class NotesFragment : Fragment(), NotesContract.View {
             val note = getItem(position)
             notes.remove(note)
             notesCopy.remove(note)
-            notifyItemRemoved(position)
+            filter(tagNow)
+//            notifyItemRemoved(position)
         }
 
         fun getItem(position: Int): Note {
@@ -267,6 +256,55 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         // RecyclerViewのアイテムのメニュータップ時のリスナ
         lateinit var onClickNoteItemMenu: (position: Int, menuId: Int) -> Unit
+
+
+        // ViewHolderに対するクリックリスナはonBindViewHolderで登録
+        class NoteViewHolder(itemView: View, val context: Context) : RecyclerView.ViewHolder(itemView) {
+            val tag = itemView.findViewById(R.id.note_item_tag) as ImageView
+            val title = itemView.findViewById(R.id.note_item_title) as TextView
+            val date = itemView.findViewById(R.id.note_item_date) as TextView
+            val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton
+            val popup = PopupWindow(context).apply {
+                contentView = LayoutInflater.from(context).inflate(R.layout.note_menu, null)
+                isOutsideTouchable = true
+                isFocusable = true
+                isTouchable = true
+            }
+
+            fun onBindViewHolder(note: Note,
+                                 onClickNoteItem: (position: Int) -> Unit,
+                                 onClickNoteItemMenu: (position: Int, menuId: Int) -> Unit) {
+                if (note.tag == 0) tag.visibility = View.INVISIBLE
+                else {
+                    tag.visibility = View.VISIBLE
+                    tag.setColorFilter(context.resources.obtainTypedArray(R.array.tag_color).getColor(note.tag, 0))
+                }
+                title.text = note.titleForList
+                date.text = Note.format.format(Date(note.date))
+                itemView.setOnClickListener {
+                    onClickNoteItem(adapterPosition)
+                }
+                menu.setOnClickListener {
+                    popup.showAsDropDown(menu, menu.width, -menu.height)    // ポップアップメニューの表示
+                }
+                popup.contentView.findViewById(R.id.note_item_menu_delete).setOnClickListener {
+                    onClickNoteItemMenu(adapterPosition, R.id.note_item_menu_delete)
+                    popup.dismiss()
+                }
+                popup.contentView.findViewById(R.id.note_item_menu_select_tag).setOnClickListener {
+                    onClickNoteItemMenu(adapterPosition, R.id.note_item_menu_select_tag)
+                    popup.dismiss()
+                }
+            }
+        }
+
+        class AdViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+            val adTextView = itemView.findViewById(R.id.ad_text_view) as TextView
+
+            fun onBindViewHolder(position: Int) {
+                adTextView.text = position.toString()
+            }
+        }
     }
 
     companion object {
