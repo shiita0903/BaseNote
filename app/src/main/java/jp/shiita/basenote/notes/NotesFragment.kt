@@ -186,8 +186,10 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         private var notesCopy: MutableList<Note> = mutableListOf()  // notesの一時退避場所
 
+        private val NOTE_VIEW = 0
+        private val AD_VIEW = 1
         private val interval = 2
-
+        private val dummyNoteId = UUID.randomUUID().toString()
         private var tagNow = 0
 
         private val inflater = LayoutInflater.from(context)
@@ -209,19 +211,17 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         override fun getItemCount(): Int = notes.size
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
-            return when (viewType) {
-                0 -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
-                1 -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false), context)
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
+                NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
+                AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false))
                 else -> error("viewTypeが正しくありません")
-            }
         }
 
-        override fun getItemViewType(position: Int): Int = if (position % (interval + 1) == interval) 1 else 0
+        override fun getItemViewType(position: Int): Int = if (notes[position].id == dummyNoteId) AD_VIEW else NOTE_VIEW
 
         fun insertDummyNote() {
             for (i in (itemCount - 1) / interval downTo 1) {
-                notes.add(i* interval, Note())
+                notes.add(i* interval, Note(id = dummyNoteId))
             }
         }
 
@@ -242,8 +242,17 @@ class NotesFragment : Fragment(), NotesContract.View {
             val note = getItem(position)
             notes.remove(note)
             notesCopy.remove(note)
-            filter(tagNow)
-//            notifyItemRemoved(position)
+            notifyItemRemoved(position)
+            // 広告が連続しているかのチェック
+            if (checkAdContinuity(position)) {
+                notes.removeAt(position)
+                notifyItemRemoved(position)
+            }
+            // 広告が一つだけ残っていないかのチェック
+            if (itemCount == 1 && notes[0].id == dummyNoteId) {
+                notes.removeAt(0)
+                notifyItemRemoved(0)
+            }
         }
 
         fun getItem(position: Int): Note {
@@ -251,14 +260,16 @@ class NotesFragment : Fragment(), NotesContract.View {
             return notes[position]
         }
 
+        private fun checkAdContinuity(position: Int): Boolean
+                = position in 1 until itemCount && notes[position].id == dummyNoteId && notes[position - 1].id == dummyNoteId
+
         // RecyclerViewのアイテムタップ時のリスナ
         lateinit var onClickNoteItem: (position: Int) -> Unit
 
         // RecyclerViewのアイテムのメニュータップ時のリスナ
         lateinit var onClickNoteItemMenu: (position: Int, menuId: Int) -> Unit
 
-
-        // ViewHolderに対するクリックリスナはonBindViewHolderで登録
+        // ノートのViewHolder
         class NoteViewHolder(itemView: View, val context: Context) : RecyclerView.ViewHolder(itemView) {
             val tag = itemView.findViewById(R.id.note_item_tag) as ImageView
             val title = itemView.findViewById(R.id.note_item_title) as TextView
@@ -271,6 +282,7 @@ class NotesFragment : Fragment(), NotesContract.View {
                 isTouchable = true
             }
 
+            // ViewHolderに対するクリックリスナはonBindViewHolderで登録
             fun onBindViewHolder(note: Note,
                                  onClickNoteItem: (position: Int) -> Unit,
                                  onClickNoteItemMenu: (position: Int, menuId: Int) -> Unit) {
@@ -298,7 +310,8 @@ class NotesFragment : Fragment(), NotesContract.View {
             }
         }
 
-        class AdViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
+        // 広告のViewHolder
+        class AdViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val adTextView = itemView.findViewById(R.id.ad_text_view) as TextView
 
             fun onBindViewHolder(position: Int) {
