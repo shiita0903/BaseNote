@@ -144,6 +144,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                             content.text = presenter?.addMyURLSpanToContent(content.text as Spannable, span, start, end)
                             webView.loadUrl(urlStr)
                         }
+                        mode?.finish()
                         return true
                     }
 
@@ -153,18 +154,16 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                 menu?.run {
-                    add(Menu.NONE, R.id.search_google, Menu.FIRST, getString(R.string.menu_search_google))
-                    add(Menu.NONE, R.id.search_wikipedia, Menu.FIRST, getString(R.string.menu_search_wikipedia))
-                    add(Menu.NONE, R.id.search_weblio, Menu.FIRST, getString(R.string.menu_search_weblio))
+                    add(Menu.NONE, R.id.search_google, Menu.NONE, getString(R.string.menu_search_google))
+                    add(Menu.NONE, R.id.search_wikipedia, Menu.NONE, getString(R.string.menu_search_wikipedia))
+                    add(Menu.NONE, R.id.search_weblio, Menu.NONE, getString(R.string.menu_search_weblio))
                 }
                 return true
             }
 
             override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
 
-            override fun onDestroyActionMode(mode: ActionMode?) {
-                content.clearFocus()
-            }
+            override fun onDestroyActionMode(mode: ActionMode?) {}
         }
 
         setHasOptionsMenu(true)
