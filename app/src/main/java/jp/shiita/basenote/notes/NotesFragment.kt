@@ -11,10 +11,10 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.*
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import jp.shiita.basenote.R
 import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
@@ -188,9 +188,11 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         private val NOTE_VIEW = 0
         private val AD_VIEW = 1
-        private val interval = 2
+        private val interval = 6
         private val dummyNoteId = UUID.randomUUID().toString()
         private var tagNow = 0
+        private val density = context.resources.displayMetrics.density
+        private val displayWidth = context.resources.displayMetrics.widthPixels
 
         private val inflater = LayoutInflater.from(context)
 
@@ -203,7 +205,7 @@ class NotesFragment : Fragment(), NotesContract.View {
                     }
                 }
                 is AdViewHolder -> {
-                    holder.onBindViewHolder(position)
+                    holder.onBindViewHolder()
                 }
                 else -> error("定義されていないViewHolderです")
             }
@@ -213,13 +215,15 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
                 NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
-                AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false))
+                AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false),
+                        (displayWidth / density).toInt(),
+                        (context.resources.getDimension(R.dimen.recycler_view_height) / density).toInt(), context)
                 else -> error("viewTypeが正しくありません")
         }
 
         override fun getItemViewType(position: Int): Int = if (notes[position].id == dummyNoteId) AD_VIEW else NOTE_VIEW
 
-        fun insertDummyNote() {
+        private fun insertDummyNote() {
             for (i in (itemCount - 1) / interval downTo 1) {
                 notes.add(i* interval, Note(id = dummyNoteId))
             }
@@ -309,13 +313,21 @@ class NotesFragment : Fragment(), NotesContract.View {
                 }
             }
         }
-
         // 広告のViewHolder
-        class AdViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val adTextView = itemView.findViewById(R.id.ad_text_view) as TextView
+        class AdViewHolder(itemView: View, adWidth: Int, adHeight: Int, context: Context) : RecyclerView.ViewHolder(itemView) {
+            val adView = AdView(context)
 
-            fun onBindViewHolder(position: Int) {
-                adTextView.text = position.toString()
+            init {
+                // xmlでの定義ではなくコードからViewを作成することで、広告サイズを可変にする
+                (itemView.findViewById(R.id.ad_layout) as LinearLayout).run {
+                    adView.adSize = AdSize(adWidth, adHeight)
+                    adView.adUnitId = "ca-app-pub-5746085230536493/4235634153"
+                    addView(adView)
+                }
+            }
+
+            fun onBindViewHolder() {
+                adView.loadAd(AdRequest.Builder().addTestDevice("43BF8A1A5A84B1ED639600D540F096F7").build())
             }
         }
     }
