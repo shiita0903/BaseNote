@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
@@ -17,6 +18,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.URLSpanData
@@ -119,23 +121,73 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         }
 
         // タップ時の処理をONにする
-        content.movementMethod = LinkMovementMethod.getInstance()
+        content.run {
+            movementMethod = LinkMovementMethod.getInstance()
+            setTextIsSelectable(true)
+        }
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
+            private val searchId = mapOf(R.id.menu_search_google to 0, R.id.menu_search_wikipedia to 1, R.id.menu_search_weblio to 2)
+
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 var start = 0
                 var end = content.text.length
-
                 if (content.isFocused) {
                     start = Math.max(content.selectionStart, start) // 最小値は0
                     end = Math.min(content.selectionEnd, end)       // 最大値はcontent.text.length
                 }
-
                 val word = content.text.subSequence(start, end).toString()
-                val id = mapOf(R.id.search_google to 0, R.id.search_wikipedia to 1, R.id.search_weblio to 2)
-                when (item?.itemId) {
-                    in id.keys -> {
+
+                // floating action modeに対応しているかどうかでメニュー表示を分ける
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    when (item?.itemId) {
+                        in searchId.keys -> {
+                            searchWebItemSelected(item!!.itemId, word, start, end)
+                            mode?.finish()
+                            return true
+                        }
+                    }
+                }
+                else {
+                    if (item?.itemId == R.id.menu_search_web) {
+                        PopupMenu(context, activity.findViewById(R.id.menu_search_web)).apply {
+                            inflate(R.menu.search_web_menu)
+                            setOnMenuItemClickListener {
+                                searchWebItemSelected(it.itemId, word, start, end)
+                                true
+                            }
+                            show()
+                        }
+                        mode?.finish()
+                        return true
+                    }
+                }
+
+                return false
+            }
+
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                // floating action modeに対応しているかどうかでメニュー表示を分ける
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mode?.menuInflater?.inflate(R.menu.search_web_menu, menu)
+                }
+                else {
+                    // カット、全て選択の削除
+                    menu?.removeItem(android.R.id.cut)
+                    menu?.removeItem(android.R.id.selectAll)
+                    mode?.menuInflater?.inflate(R.menu.action_mode_menu, menu)
+                }
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
+
+            override fun onDestroyActionMode(mode: ActionMode?) {}
+
+            private fun searchWebItemSelected(itemId: Int, word: String, start: Int, end: Int) {
+                when (itemId) {
+                    in searchId.keys -> {
                         startWebMode()
-                        val urlStr = presenter?.generateSearchURL(word, id[item?.itemId]!!)
+                        val urlStr = presenter?.generateSearchURL(word, searchId[itemId]!!)
                         if (urlStr != null) {
                             // MyURLSpanの設定
                             val span = MyURLSpan(urlStr).apply {
@@ -144,26 +196,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                             content.text = presenter?.addMyURLSpanToContent(content.text as Spannable, span, start, end)
                             webView.loadUrl(urlStr)
                         }
-                        mode?.finish()
-                        return true
                     }
-
                 }
-                return false
             }
-
-            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                menu?.run {
-                    add(Menu.NONE, R.id.search_google, Menu.NONE, getString(R.string.menu_search_google))
-                    add(Menu.NONE, R.id.search_wikipedia, Menu.NONE, getString(R.string.menu_search_wikipedia))
-                    add(Menu.NONE, R.id.search_weblio, Menu.NONE, getString(R.string.menu_search_weblio))
-                }
-                return true
-            }
-
-            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
-
-            override fun onDestroyActionMode(mode: ActionMode?) {}
         }
 
         setHasOptionsMenu(true)
