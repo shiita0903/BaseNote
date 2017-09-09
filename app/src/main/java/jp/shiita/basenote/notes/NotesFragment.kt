@@ -284,6 +284,9 @@ class NotesFragment : Fragment(), NotesContract.View {
                 isOutsideTouchable = true
                 isFocusable = true
                 isTouchable = true
+                // widthとheightを指定してあげないと、APIが低い時に表示されない事がある
+                width = RelativeLayout.LayoutParams.WRAP_CONTENT
+                height = RelativeLayout.LayoutParams.WRAP_CONTENT
             }
 
             // ViewHolderに対するクリックリスナはonBindViewHolderで登録
@@ -321,12 +324,13 @@ class NotesFragment : Fragment(), NotesContract.View {
                 // xmlでの定義ではなくコードからViewを作成することで、広告サイズを可変にする
                 (itemView.findViewById(R.id.ad_layout) as LinearLayout).run {
                     adView.adSize = AdSize(adWidth, adHeight)
-                    adView.adUnitId = "ca-app-pub-5746085230536493/4235634153"
+                    adView.adUnitId = context.getString(R.string.banner_ad_unit_id)
                     addView(adView)
                 }
             }
 
             fun onBindViewHolder() {
+                // TODO: リリース時に外す
                 adView.loadAd(AdRequest.Builder().addTestDevice("43BF8A1A5A84B1ED639600D540F096F7").build())
             }
         }
