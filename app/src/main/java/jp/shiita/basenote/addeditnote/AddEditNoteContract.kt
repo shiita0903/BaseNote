@@ -39,7 +39,11 @@ interface AddEditNoteContract {
 
         fun getURLSpanDataList(spannable: Spannable): List<URLSpanData>
 
-        fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable
+        fun findURLSpanData(spannable: Spannable, url: String): URLSpanData?
+
+        fun addURLSpan(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable
+
+        fun removeURLSpan(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable
 
         var isDataMissing: Boolean
     }

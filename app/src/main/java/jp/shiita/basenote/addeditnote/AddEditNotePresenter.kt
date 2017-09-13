@@ -81,7 +81,13 @@ class AddEditNotePresenter(
                 ?: emptyList()
     }
 
-    override fun addMyURLSpanToContent(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable {
+    override fun findURLSpanData(spannable: Spannable, url: String): URLSpanData? {
+        val list = getURLSpanDataList(spannable)
+        // 同じURLが複数あった時にはテキストの最初のURLのみが更新されるが、まあいいことにする
+        return list.firstOrNull { it.url == url }
+    }
+
+    override fun addURLSpan(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable {
         val spans = spannable.getSpans(0, spannable.length, MyURLSpan::class.java)
 
         // 新しいspanに被っているspanだけをフィルタして削除
@@ -105,6 +111,13 @@ class AddEditNotePresenter(
         sb.setSpan(urlSpan, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         return sb
+    }
+
+    override fun removeURLSpan(spannable: Spannable, urlSpan: MyURLSpan, start: Int, end: Int): Spannable {
+        val spans = spannable.getSpans(0, spannable.length, MyURLSpan::class.java)
+        spans.filter { urlSpan.url == it.url && start == spannable.getSpanStart(it) && end == spannable.getSpanEnd(it)}
+                .forEach { spannable.removeSpan(it) }
+        return spannable
     }
 
     private fun createNote(title: String, content: String, urlSpanList: List<URLSpanData>, tag: Int) {

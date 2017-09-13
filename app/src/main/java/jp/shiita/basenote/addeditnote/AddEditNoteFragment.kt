@@ -36,6 +36,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     private lateinit var webFrameLayout: FrameLayout
     private lateinit var webView: WebView
     private var webViewX = 0
+    // 開かれているURLのSpanの位置を保存する
+    private var urlSpanStart = 0
+    private var urlSpanEnd = 0
 
     private lateinit var webViewBar: View
     private lateinit var goForward: ImageButton
@@ -117,13 +120,23 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             goForward = (findViewById(R.id.forward_web_view_button) as ImageButton).apply {
                 setOnClickListener { webView.goForward() }
             }
+            findViewById(R.id.menu_web_view_button).setOnClickListener {
+                PopupMenu(context, activity.findViewById(R.id.menu_web_view_button)).apply {
+                    inflate(R.menu.web_view_menu)
+                    setOnMenuItemClickListener {
+                        clickWebViewMenu(it.itemId)
+                        true
+                    }
+                    show()
+                }
+            }
             findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
         }
 
         // タップ時の処理をONにする
         content.run {
             movementMethod = LinkMovementMethod.getInstance()
-            setTextIsSelectable(true)
+//            setTextIsSelectable(true)
         }
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             private val searchId = mapOf(R.id.menu_search_google to 0, R.id.menu_search_wikipedia to 1, R.id.menu_search_weblio to 2)
@@ -193,7 +206,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                             val span = MyURLSpan(urlStr).apply {
                                 setOnURLClickListener(this@AddEditNoteFragment)
                             }
-                            content.text = presenter?.addMyURLSpanToContent(content.text as Spannable, span, start, end)
+                            content.text = presenter?.addURLSpan(content.text as Spannable, span, start, end)
+                            urlSpanStart = start
+                            urlSpanEnd = end
                             webView.loadUrl(urlStr)
                         }
                     }
@@ -295,6 +310,10 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         if (editMode) return    // 編集中は無効化
         startWebMode()
         webView.loadUrl(url)
+        presenter?.findURLSpanData(content.text as Spannable, url)?.let {
+            urlSpanStart = it.start
+            urlSpanEnd = it.end
+        }
         webFrameLayout.visibility = View.VISIBLE
         webViewBar.visibility = View.VISIBLE
     }
@@ -327,6 +346,23 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         webFrameLayout.visibility = View.GONE
         webViewBar.visibility = View.GONE
         webMode = false
+    }
+
+    // WebViewのメニューがタップされた時の処理
+    private fun clickWebViewMenu(id: Int) {
+        when (id) {
+            R.id.web_view_menu_update_link -> {
+                val urlStr = webView.url
+                val span = MyURLSpan(urlStr).apply {
+                    setOnURLClickListener(this@AddEditNoteFragment)
+                }
+                val spannable = presenter!!.removeURLSpan(content.text as Spannable, span, urlSpanStart, urlSpanEnd)
+                content.text = presenter!!.addURLSpan(spannable, span, urlSpanStart, urlSpanEnd)
+            }
+            R.id.web_view_menu_full_screen -> {
+                TODO("未実装")
+            }
+        }
     }
 
     //ソフトキーボードを閉じる

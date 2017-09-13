@@ -54,7 +54,6 @@
                 android:id="@+id/back_web_view_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_gravity="start|bottom"
                 android:background="@null"
                 android:src="@drawable/ic_back"
                 android:visibility="invisible"/>
@@ -63,7 +62,6 @@
                 android:id="@+id/forward_web_view_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_gravity="end|bottom"
                 android:background="@null"
                 android:src="@drawable/ic_forward"
                 android:visibility="invisible"/>
@@ -76,10 +74,16 @@
                 android:visibility="invisible"/>
 
             <ImageButton
+                android:id="@+id/menu_web_view_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@null"
+                android:src="@drawable/ic_menu_grey"/>
+
+            <ImageButton
                 android:id="@+id/close_web_view_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_gravity=""
                 android:background="@null"
                 android:src="@drawable/ic_close"/>
         </LinearLayout>

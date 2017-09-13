@@ -34,6 +34,9 @@
         <item>キャンセル</item>
     </string-array>
 
+    <string name="web_view_menu_update_link">リンクを更新する</string>
+    <string name="web_view_menu_full_screen">全画面表示</string>
+
     <string name="select_tag">タグの選択</string>
     <string name="tag_none">なし</string>
     <string name="tag_red">赤</string>
