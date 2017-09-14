@@ -135,8 +135,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
         // タップ時の処理をONにする
         content.run {
+            setTextIsSelectable(true)
             movementMethod = LinkMovementMethod.getInstance()
-//            setTextIsSelectable(true)
         }
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             private val searchId = mapOf(R.id.menu_search_google to 0, R.id.menu_search_wikipedia to 1, R.id.menu_search_weblio to 2)
@@ -285,10 +285,17 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         editMode = !editMode
 
         // フォーカスが与えられるかどうかで、編集の可否を制御
-        title.isFocusable = editMode
-        title.isFocusableInTouchMode = editMode
-        content.isFocusable = editMode
-        content.isFocusableInTouchMode = editMode
+        title.run {
+            isFocusable = editMode
+            isFocusableInTouchMode = editMode
+        }
+        content.run {
+            isFocusable = editMode
+            isFocusableInTouchMode = editMode
+            // setTextIsSelectableをtrueにするとmovementMethodはnullになってしまうので順番に注意する
+            setTextIsSelectable(editMode)
+            movementMethod = LinkMovementMethod.getInstance()
+        }
 
         val act = (activity as AddEditNoteActivity)
         when {
