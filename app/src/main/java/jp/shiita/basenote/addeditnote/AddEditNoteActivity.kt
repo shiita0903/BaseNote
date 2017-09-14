@@ -74,12 +74,38 @@ class AddEditNoteActivity : AppCompatActivity() {
         }
     }
 
-    fun showTopFab() {
+    fun switchTopFab() {
         startScaleAnim(visible = fabTop, gone = fabBottom)
     }
 
-    fun showBottomFab() {
+    fun switchBottomFab() {
         startScaleAnim(visible = fabBottom, gone = fabTop)
+    }
+
+    fun showTopFab() {
+        getScaleAnim(fabTop, 500, toSmall = false).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    fabTop.apply {
+                        visibility = View.VISIBLE
+                        scaleX = 0.1f
+                        scaleY = 0.1f
+                    }
+                }
+            })
+            start()
+        }
+    }
+
+    fun hideTopFab() {
+        getScaleAnim(fabTop, 500, toSmall = true).run {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    fabTop.visibility = View.GONE
+                }
+            })
+            start()
+        }
     }
 
     fun setFabIconResource(id: Int) {

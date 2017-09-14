@@ -331,7 +331,7 @@ class NotesFragment : Fragment(), NotesContract.View {
 
             fun onBindViewHolder() {
                 // TODO: リリース時に外す
-                adView.loadAd(AdRequest.Builder().addTestDevice("43BF8A1A5A84B1ED639600D540F096F7").build())
+                adView.loadAd(AdRequest.Builder().build())
             }
         }
     }

@@ -29,8 +29,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     override var presenter: AddEditNoteContract.Presenter? = null
 
+    private lateinit var inputView: View
     private lateinit var title: TextView
-
     private lateinit var content: TextView
 
     private lateinit var webFrameLayout: FrameLayout
@@ -89,6 +89,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         val root = inflater.inflate(R.layout.addeditnote_frag, container, false)
         // Viewの初期設定
         with(root) {
+            inputView = findViewById(R.id.add_edit_note_input)
             title = findViewById(R.id.add_edit_note_title) as TextView
             content = findViewById(R.id.add_edit_note_content) as TextView
             webFrameLayout = findViewById(R.id.web_frame_layout) as FrameLayout
@@ -331,10 +332,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     // Webページを表示する処理。fabとアクションバーを非表示に
     private fun startWebMode() {
         hideSoftInput()
+        inputView.visibility = View.VISIBLE
         webFrameLayout.visibility = View.VISIBLE
         webViewBar.visibility = View.VISIBLE
         (activity as AddEditNoteActivity).apply {
-            showTopFab()
+            switchTopFab()
             supportActionBar?.hide()
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE
         }
@@ -344,13 +346,26 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     // WebViewを閉じる処理。fabとアクションバー再表示する
     private fun stopWebMode() {
         (activity as AddEditNoteActivity).apply {
-            showBottomFab()
+            switchBottomFab()
             supportActionBar?.show()
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
         }
+        inputView.visibility = View.VISIBLE
         webFrameLayout.visibility = View.GONE
         webViewBar.visibility = View.GONE
         webMode = false
+    }
+
+    // 全画面表示切り替え
+    private fun switchFullScreen() {
+        if (inputView.visibility == View.VISIBLE) {
+            inputView.visibility = View.GONE
+            (activity as AddEditNoteActivity).hideTopFab()
+        }
+        else {
+            inputView.visibility = View.VISIBLE
+            (activity as AddEditNoteActivity).showTopFab()
+        }
     }
 
     // WebViewのメニューがタップされた時の処理
@@ -364,9 +379,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 val spannable = presenter!!.removeURLSpan(content.text as Spannable, span, urlSpanStart, urlSpanEnd)
                 content.text = presenter!!.addURLSpan(spannable, span, urlSpanStart, urlSpanEnd)
             }
-            R.id.web_view_menu_full_screen -> {
-                TODO("未実装")
-            }
+            R.id.web_view_menu_full_screen -> switchFullScreen()
         }
     }
 
