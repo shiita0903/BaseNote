@@ -12,7 +12,6 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
@@ -69,8 +68,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // 画面起動時にソフトウェアキーボードを出さない
-        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         // スワイプ検知に利用
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onFling(event1: MotionEvent, event2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
@@ -134,8 +131,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
         }
 
-        // タップ時の処理をONにする
-        content.setTextIsSelectable(true)
+        // ソフトキーボードの自動出現と、選択を可能にすることを同時に行いたいため、キーボードの出現はClickListenerに任せる
+        content.run {
+            setTextIsSelectable(true)       // trueだとソフトキーボードは自動出現しない
+            setOnClickListener { if (editMode) showSoftInput() }
+        }
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             private val searchId = mapOf(R.id.menu_search_google to 0, R.id.menu_search_wikipedia to 1, R.id.menu_search_weblio to 2)
 
@@ -293,8 +293,6 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             // setTextIsSelectableがtrueだとmovementMethodが機能しないので注意する
             setTextIsSelectable(editMode)
             if (!editMode) movementMethod = LinkMovementMethod.getInstance()
-            Log.d("Selectable", isTextSelectable.toString())
-            Log.d("Method", (movementMethod == null).toString())
         }
 
         val act = (activity as AddEditNoteActivity)
@@ -372,10 +370,16 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         }
     }
 
-    //ソフトキーボードを閉じる
+    // ソフトキーボードを閉じる
     private fun hideSoftInput() {
         val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
+    }
+
+    // ソフトキーボードを開く
+    private fun showSoftInput() {
+        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(content, 0)
     }
 
     companion object {
