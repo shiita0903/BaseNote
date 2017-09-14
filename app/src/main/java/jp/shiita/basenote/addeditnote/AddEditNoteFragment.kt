@@ -12,6 +12,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
@@ -134,10 +135,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         }
 
         // タップ時の処理をONにする
-        content.run {
-            setTextIsSelectable(true)
-            movementMethod = LinkMovementMethod.getInstance()
-        }
+        content.setTextIsSelectable(true)
         content.customSelectionActionModeCallback = object : ActionMode.Callback {
             private val searchId = mapOf(R.id.menu_search_google to 0, R.id.menu_search_wikipedia to 1, R.id.menu_search_weblio to 2)
 
@@ -292,9 +290,11 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         content.run {
             isFocusable = editMode
             isFocusableInTouchMode = editMode
-            // setTextIsSelectableをtrueにするとmovementMethodはnullになってしまうので順番に注意する
+            // setTextIsSelectableがtrueだとmovementMethodが機能しないので注意する
             setTextIsSelectable(editMode)
-            movementMethod = LinkMovementMethod.getInstance()
+            if (!editMode) movementMethod = LinkMovementMethod.getInstance()
+            Log.d("Selectable", isTextSelectable.toString())
+            Log.d("Method", (movementMethod == null).toString())
         }
 
         val act = (activity as AddEditNoteActivity)
