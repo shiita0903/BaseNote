@@ -112,7 +112,25 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            webViewBar = findViewById(R.id.add_edit_note_web_view_bar)
+            webViewBar = findViewById(R.id.add_edit_note_web_view_bar).apply {
+                setOnTouchListener(object : View.OnTouchListener {
+                    private var beforeY: Float = 0f
+                    private var first: Boolean = true
+
+                    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                        if (event == null) return false     // スマートキャスト
+                        val dy = beforeY - event.rawY
+                        beforeY = event.rawY
+
+                        if (first) first = false
+                        else webFrameLayout.layoutParams = webFrameLayout.layoutParams.apply {
+                            height += dy.toInt()
+                            if (height < 0) height = 0
+                        }
+                        return true
+                    }
+                })
+            }
             goBack = (findViewById(R.id.back_web_view_button) as ImageButton).apply {
                 setOnClickListener { webView.goBack() }
             }

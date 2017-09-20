@@ -44,8 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:visibility="gone">
+        android:layout_gravity="bottom">
 
         <ImageButton
             android:id="@+id/back_web_view_button"
@@ -88,9 +87,7 @@
     <FrameLayout
         android:id="@+id/web_frame_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone">
+        android:layout_height="200dp">
 
         <WebView
             android:id="@+id/web_view"
