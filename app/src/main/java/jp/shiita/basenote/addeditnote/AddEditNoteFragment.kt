@@ -119,14 +119,17 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
                     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                         if (event == null) return false     // スマートキャスト
+                        if (event.action == MotionEvent.ACTION_DOWN) first = true
                         val dy = beforeY - event.rawY
                         beforeY = event.rawY
 
-                        if (first) first = false
-                        else webFrameLayout.layoutParams = webFrameLayout.layoutParams.apply {
-                            height += dy.toInt()
-                            if (height < 0) height = 0
-                        }
+                        if (first)
+                            first = false
+                        else
+                            webFrameLayout.layoutParams = webFrameLayout.layoutParams.apply {
+                                height += dy.toInt()
+                                if (height < 0) height = 0
+                            }
                         return true
                     }
                 })
