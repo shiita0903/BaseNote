@@ -11,11 +11,11 @@ import jp.shiita.basenote.data.NotesDataSource
 
 class SelectNoteDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val text = arguments.getString(ARGUMENT_APPEND_TEXT)
-        var startApp = arguments.getBoolean(ARGUMENT_START_APP)
+        val text = arguments!!.getString(ARGUMENT_APPEND_TEXT)
+        var startApp = arguments!!.getBoolean(ARGUMENT_START_APP)
         val items = NotesDataSource.getNotes()
         val checkedItems = mutableListOf<Int>()
-        return AlertDialog.Builder(activity)
+        return AlertDialog.Builder(activity!!)
                 .setTitle(getString(R.string.select_note))
                 .setMultiChoiceItems(items.map(this::makeItemString).toTypedArray(), null) { _, which, isChecked ->
                     if (isChecked)

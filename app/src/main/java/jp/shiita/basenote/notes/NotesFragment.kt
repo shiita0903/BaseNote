@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.DividerItemDecoration
@@ -21,6 +20,7 @@ import jp.shiita.basenote.addeditnote.AddEditNoteFragment
 import jp.shiita.basenote.addeditnote.SelectTagDialogFragment
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.util.snackbarLong
+import kotlinx.android.synthetic.main.notes_act.*
 import java.util.*
 
 class NotesFragment : Fragment(), NotesContract.View {
@@ -40,7 +40,7 @@ class NotesFragment : Fragment(), NotesContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.notes_frag, container, false)
 
-        notesAdapter = NotesAdapter(context, mutableListOf()).apply {
+        notesAdapter = NotesAdapter(activity!!, mutableListOf()).apply {
             onClickNoteItem = { position -> presenter?.editNote(getItem(position)) }    // RecyclerViewの要素自体をタップ時
             onClickNoteItemMenu = { position, menuId ->                                 // RecyclerViewの要素のメニューをタップ時
                 val note = getItem(position)
@@ -95,9 +95,11 @@ class NotesFragment : Fragment(), NotesContract.View {
         }
 
         // Set up floating action button
-        (activity.findViewById(R.id.fab_add_note) as FloatingActionButton).apply {
-            setImageResource(R.drawable.ic_add)
-            setOnClickListener { presenter?.addNewNote() }
+        activity?.let { act ->
+            act.fab_add_note.apply {
+                setImageResource(R.drawable.ic_add)
+                setOnClickListener { presenter?.addNewNote() }
+            }
         }
         setHasOptionsMenu(true)
 
@@ -213,12 +215,12 @@ class NotesFragment : Fragment(), NotesContract.View {
 
         override fun getItemCount(): Int = notes.size
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
-                NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
-                AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false),
-                        (displayWidth / density).toInt(),
-                        (context.resources.getDimension(R.dimen.recycler_view_height) / density).toInt(), context)
-                else -> error("viewTypeが正しくありません")
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
+            NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
+            AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false),
+                                    (displayWidth / density).toInt(),
+                                    (context.resources.getDimension(R.dimen.recycler_view_height) / density).toInt(), context)
+            else -> error("viewTypeが正しくありません")
         }
 
         override fun getItemViewType(position: Int): Int = if (notes[position].id == dummyNoteId) AD_VIEW else NOTE_VIEW
@@ -306,11 +308,11 @@ class NotesFragment : Fragment(), NotesContract.View {
                 menu.setOnClickListener {
                     popup.showAsDropDown(menu, menu.width, -menu.height)    // ポップアップメニューの表示
                 }
-                popup.contentView.findViewById(R.id.note_item_menu_delete).setOnClickListener {
+                popup.contentView.findViewById<View>(R.id.note_item_menu_delete).setOnClickListener {
                     onClickNoteItemMenu(adapterPosition, R.id.note_item_menu_delete)
                     popup.dismiss()
                 }
-                popup.contentView.findViewById(R.id.note_item_menu_select_tag).setOnClickListener {
+                popup.contentView.findViewById<View>(R.id.note_item_menu_select_tag).setOnClickListener {
                     onClickNoteItemMenu(adapterPosition, R.id.note_item_menu_select_tag)
                     popup.dismiss()
                 }

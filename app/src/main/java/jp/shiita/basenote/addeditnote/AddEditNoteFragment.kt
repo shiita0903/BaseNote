@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -24,6 +23,7 @@ import jp.shiita.basenote.R
 import jp.shiita.basenote.data.URLSpanData
 import jp.shiita.basenote.util.MyURLSpan
 import jp.shiita.basenote.util.snackbarLong
+import kotlinx.android.synthetic.main.addeditnote_act.*
 
 class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnURLClickListener {
 
@@ -59,11 +59,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        with(activity.findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton) {
-            setOnClickListener { switchEditMode(save = true) }
-        }
-        with(activity.findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton) {
-            setOnClickListener { switchEditMode(save = true) }
+        activity?.let { act ->
+            act.fab_edit_note_done_top.setOnClickListener { switchEditMode(save = true) }
+            act.fab_edit_note_done_bottom.setOnClickListener { switchEditMode(save = true) }
         }
     }
 
@@ -112,7 +110,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 // WebViewがレイアウトに設置されてから、サイズを測る
                 viewTreeObserver.addOnGlobalLayoutListener { webViewX = webView.width }
             }
-            webViewBar = findViewById(R.id.add_edit_note_web_view_bar).apply {
+            webViewBar = findViewById<View>(R.id.add_edit_note_web_view_bar).apply {
                 setOnTouchListener(object : View.OnTouchListener {
                     private var beforeY: Float = 0f
                     private var first: Boolean = true
@@ -140,8 +138,8 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             goForward = (findViewById(R.id.forward_web_view_button) as ImageButton).apply {
                 setOnClickListener { webView.goForward() }
             }
-            findViewById(R.id.menu_web_view_button).setOnClickListener {
-                PopupMenu(context, activity.findViewById(R.id.menu_web_view_button)).apply {
+            findViewById<View>(R.id.menu_web_view_button).setOnClickListener {
+                PopupMenu(context, activity?.findViewById(R.id.menu_web_view_button)).apply {
                     inflate(R.menu.web_view_menu)
                     setOnMenuItemClickListener {
                         clickWebViewMenu(it.itemId)
@@ -150,7 +148,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                     show()
                 }
             }
-            findViewById(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
+            findViewById<View>(R.id.close_web_view_button).setOnClickListener { stopWebMode() }
         }
 
         // ソフトキーボードの自動出現と、選択を可能にすることを同時に行いたいため、キーボードの出現はClickListenerに任せる
@@ -182,7 +180,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
                 }
                 else {
                     if (item?.itemId == R.id.menu_search_web) {
-                        PopupMenu(context, activity.findViewById(R.id.menu_search_web)).apply {
+                        PopupMenu(context, activity?.findViewById(R.id.menu_search_web)).apply {
                             inflate(R.menu.search_web_menu)
                             setOnMenuItemClickListener {
                                 searchWebItemSelected(it.itemId, word, start, end)
@@ -272,7 +270,7 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
             SELECT_TAG_REQUEST_CODE -> {
                 noteTag = data?.getIntExtra(SelectTagDialogFragment.ARGUMENT_TAG, 0)!!
                 presenter?.updateTag(noteTag)
-                activity.invalidateOptionsMenu()    // メニューを読み込み直して、タグの色を反映
+                activity?.invalidateOptionsMenu()    // メニューを読み込み直して、タグの色を反映
             }
         }
     }
@@ -331,7 +329,9 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
         hideSoftInput()
     }
 
-    override fun finishActivity() = activity.finish()
+    override fun finishActivity() {
+        activity?.finish()
+    }
 
     override fun onURLClick(url: String) {
         if (editMode) return    // 編集中は無効化
@@ -406,13 +406,15 @@ class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnUR
 
     // ソフトキーボードを閉じる
     private fun hideSoftInput() {
-        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val act = activity ?: return
+        val inputMethodManager = act.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(content.windowToken, 0)
     }
 
     // ソフトキーボードを開く
     private fun showSoftInput() {
-        val inputMethodManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val act = activity ?: return
+        val inputMethodManager = act.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(content, 0)
     }
 

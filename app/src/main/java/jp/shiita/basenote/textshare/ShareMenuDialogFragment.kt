@@ -12,10 +12,10 @@ import jp.shiita.basenote.data.NotesDataSource
 class ShareMenuDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val items = resources.getStringArray(R.array.text_share_item)
-        val text = arguments.getString(ARGUMENT_SHARE_TEXT)
+        val text = arguments!!.getString(ARGUMENT_SHARE_TEXT)
         var finish = true
         var startApp = false
-        return AlertDialog.Builder(activity)
+        return AlertDialog.Builder(activity!!)
                 .setTitle("「$text」")
                 .setItems(items) { _, which ->
                     when (which) {
@@ -54,7 +54,7 @@ class ShareMenuDialogFragment : DialogFragment() {
                 putString(SelectNoteDialogFragment.ARGUMENT_APPEND_TEXT, text)
                 putBoolean(SelectNoteDialogFragment.ARGUMENT_START_APP, startApp)
             }
-        }.show(activity.supportFragmentManager, SelectNoteDialogFragment.TAG)
+        }.show(activity?.supportFragmentManager, SelectNoteDialogFragment.TAG)
     }
 
     companion object {
