@@ -6,18 +6,22 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.R
-import jp.shiita.basenote.util.addFragmentToActivity
+import jp.shiita.basenote.data.NotesRepository
+import jp.shiita.basenote.util.replaceFragment
+import javax.inject.Inject
 
-class AddEditNoteActivity : AppCompatActivity() {
-    private lateinit var addEditNotePresenter: AddEditNotePresenter
+class AddEditNoteActivity : DaggerAppCompatActivity() {
     private lateinit var fabTop: FloatingActionButton
     private lateinit var fabBottom: FloatingActionButton
+    private lateinit var addEditNotePresenter: AddEditNotePresenter
+    @Inject lateinit var fragment: AddEditNoteFragment
+    @Inject lateinit var notesRepository: NotesRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,13 +40,16 @@ class AddEditNoteActivity : AppCompatActivity() {
         val noteId = intent.getStringExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)
         val noteTag = intent.getIntExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_TAG, 0)
         setToolbarTitle(editMode = true)
-        val addEditNoteFragment = getFragment(noteId)
 
         var shouldLoadDataFromRepo = true
 
-        // Prevent the presenter from loading data from the repository if this is a config change.
-        if (savedInstanceState != null) {
-            // Data might not have loaded when the config change happen, so we saved the state.
+        if (savedInstanceState == null) {
+            fragment.arguments = Bundle().apply {
+                putString(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID, noteId)
+            }
+            supportFragmentManager.replaceFragment(R.id.container, fragment)
+        }
+        else {
             shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY)
         }
 
@@ -50,8 +57,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         addEditNotePresenter = AddEditNotePresenter(
                 noteId,
                 noteTag,
-                addEditNoteFragment,
-                shouldLoadDataFromRepo)
+                fragment,
+                shouldLoadDataFromRepo,
+                notesRepository)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -153,19 +161,6 @@ class AddEditNoteActivity : AppCompatActivity() {
             interpolator = if (toSmall) AccelerateInterpolator() else DecelerateInterpolator()
             playTogether(anim1, anim2)
         }
-    }
-
-    private fun getFragment(noteId: String?): AddEditNoteFragment  {
-        return supportFragmentManager.findFragmentById(R.id.contentFrame)
-                as AddEditNoteFragment? ?:
-                AddEditNoteFragment.newInstance().also {
-                    if (intent.hasExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)) {
-                        it.arguments = Bundle().apply {
-                            putString(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID, noteId)
-                        }
-                    }
-                    addFragmentToActivity(supportFragmentManager, it, R.id.contentFrame)
-                }
     }
 
     companion object {

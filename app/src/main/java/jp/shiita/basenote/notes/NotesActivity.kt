@@ -4,25 +4,25 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
-import com.crashlytics.android.Crashlytics
 import com.google.android.gms.ads.MobileAds
-import io.fabric.sdk.android.Fabric
+import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.R
-import jp.shiita.basenote.util.addFragmentToActivity
+import jp.shiita.basenote.data.NotesRepository
+import jp.shiita.basenote.util.replaceFragment
+import javax.inject.Inject
 
-class NotesActivity : AppCompatActivity() {
+class NotesActivity : DaggerAppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
-
     private lateinit var notesPresenter: NotesPresenter
+    @Inject lateinit var fragment: NotesFragment
+    @Inject lateinit var notesRepository: NotesRepository
 
     var filterTag = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Fabric.with(this, Crashlytics())    // Fabricの起動
         MobileAds.initialize(this, resources.getString(R.string.banner_ad_unit_id))    // 広告読み込み
         setContentView(R.layout.notes_act)
 
@@ -41,13 +41,12 @@ class NotesActivity : AppCompatActivity() {
         val navigationView = findViewById(R.id.nav_view) as NavigationView
         setupDrawerContent(navigationView)
 
-        val notesFragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
-                as NotesFragment? ?: NotesFragment.newInstance().also {
-                    addFragmentToActivity(supportFragmentManager, it, R.id.contentFrame)
+        if (savedInstanceState == null) {
+            supportFragmentManager.replaceFragment(R.id.container, fragment)
         }
 
         // Create the presenter
-        notesPresenter = NotesPresenter(notesFragment)
+        notesPresenter = NotesPresenter(fragment, notesRepository)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

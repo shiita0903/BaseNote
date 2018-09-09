@@ -3,17 +3,20 @@ package jp.shiita.basenote.textshare
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
+import dagger.android.DaggerDialogFragment
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.Note
-import jp.shiita.basenote.data.NotesDataSource
+import jp.shiita.basenote.data.NotesRepository
+import javax.inject.Inject
 
-class SelectNoteDialogFragment : DialogFragment() {
+class SelectNoteDialogFragment @Inject constructor() : DaggerDialogFragment() {
+    @Inject lateinit var notesRepository: NotesRepository
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val text = arguments!!.getString(ARGUMENT_APPEND_TEXT)
         var startApp = arguments!!.getBoolean(ARGUMENT_START_APP)
-        val items = NotesDataSource.getNotes()
+        val items = notesRepository.getNotes()
         val checkedItems = mutableListOf<Int>()
         return AlertDialog.Builder(activity!!)
                 .setTitle(getString(R.string.select_note))
@@ -57,9 +60,9 @@ class SelectNoteDialogFragment : DialogFragment() {
     }
 
     private fun updateNote(id: String, text: String) {
-        val note = NotesDataSource.getNote(id)
+        val note = notesRepository.getNote(id)
         if (note != null)
-            NotesDataSource.updateNote(note.apply { content += (System.getProperty("line.separator") + text) })
+            notesRepository.updateNote(note.apply { content += (System.getProperty("line.separator") + text) })
     }
 
     companion object {

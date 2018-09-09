@@ -1,9 +1,14 @@
 package jp.shiita.basenote.notes
 
 import jp.shiita.basenote.data.Note
-import jp.shiita.basenote.data.NotesDataSource
+import jp.shiita.basenote.data.NotesRealmDataSource
+import jp.shiita.basenote.data.NotesRepository
+import javax.inject.Inject
 
-class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.Presenter {
+class NotesPresenter @Inject constructor(
+        private val notesView: NotesContract.View,
+        private val notesRepository: NotesRepository
+) : NotesContract.Presenter {
 
     private var firstLoad = true
 
@@ -22,33 +27,33 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
     }
 
     override fun updateNote(note: Note) {
-        NotesDataSource.updateNote(note)
+        notesRepository.updateNote(note)
     }
 
     override fun deleteNote(note: Note) {
-        NotesDataSource.deleteNote(note.id)
+        notesRepository.deleteNote(note.id)
         notesView.showDeleteNote(note.titleForList)
     }
 
     override fun deleteAllNotes(tag: Int) {
-        val empty = if (tag == 0) NotesDataSource.getNotes().isEmpty()
-                    else          NotesDataSource.getNotes().any { it.tag == tag }.not()
+        val empty = if (tag == 0) notesRepository.getNotes().isEmpty()
+                    else          notesRepository.getNotes().any { it.tag == tag }.not()
         if (empty) {
             notesView.showNoNotesError()
             return
         }
-        if (tag == 0) NotesDataSource.deleteAllNotes()
-        else          NotesDataSource.deleteAllNotes(tag)
+        if (tag == 0) notesRepository.deleteAllNotes()
+        else          notesRepository.deleteAllNotes(tag)
         if (!notesView.isActive) {
             return
         }
         if (tag == 0) notesView.showNoNotes()
-        else          notesView.showNotes(NotesDataSource.getNotes().toMutableList())
+        else          notesView.showNotes(notesRepository.getNotes().toMutableList())
         notesView.showDeleteAllNotes()
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the [NotesDataSource]
+     * @param forceUpdate   Pass in true to refresh the data in the [NotesRealmDataSource]
      * *
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
@@ -60,7 +65,7 @@ class NotesPresenter(private val notesView: NotesContract.View) : NotesContract.
             // キャッシュを利用していないので、特に何もしない
         }
 
-        val notes = NotesDataSource.getNotes()
+        val notes = notesRepository.getNotes()
 
         if (!notesView.isActive) {
             return

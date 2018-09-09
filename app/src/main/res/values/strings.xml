@@ -59,5 +59,6 @@
         <item>@string/tag_black</item>
     </string-array>
 
+    <string name="realm_name">BaseNote.realm</string>
     <string name="banner_ad_unit_id">ca-app-pub-5746085230536493/4235634153</string>
 </resources>

@@ -4,15 +4,17 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import io.realm.RealmList
 import jp.shiita.basenote.data.Note
-import jp.shiita.basenote.data.NotesDataSource
+import jp.shiita.basenote.data.NotesRepository
 import jp.shiita.basenote.data.URLSpanData
 import jp.shiita.basenote.util.MyURLSpan
+import javax.inject.Inject
 
-class AddEditNotePresenter(
+class AddEditNotePresenter @Inject constructor(
         private var noteId: String?,
         defaultTag: Int,
         private val addEditNoteView: AddEditNoteContract.View,
-        override var isDataMissing: Boolean
+        override var isDataMissing: Boolean,
+        private val notesRepository: NotesRepository
 ) : AddEditNoteContract.Presenter {
 
     init {
@@ -37,15 +39,15 @@ class AddEditNotePresenter(
 
     override fun updateTag(tag: Int) {
         if (noteId != null) {
-            val note = NotesDataSource.getNote(noteId!!)?.apply { this.tag = tag }
+            val note = notesRepository.getNote(noteId!!)?.apply { this.tag = tag }
             if (note != null)
-                NotesDataSource.updateNote(note)
+                notesRepository.updateNote(note)
         }
     }
 
     override fun deleteNote() {
         if (noteId != null) {
-            NotesDataSource.deleteNote(noteId!!)
+            notesRepository.deleteNote(noteId!!)
         }
         addEditNoteView.finishActivity()
     }
@@ -54,7 +56,7 @@ class AddEditNotePresenter(
         if (noteId == null) {
             throw RuntimeException("populateNote() was called but note is new.")
         }
-        val note = NotesDataSource.getNote(noteId!!)
+        val note = notesRepository.getNote(noteId!!)
         if (addEditNoteView.isActive) {
             if (note != null) {
                 addEditNoteView.run {
@@ -124,7 +126,7 @@ class AddEditNotePresenter(
         val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), tag)
         if (!newNote.isEmpty) {
             noteId = newNote.id     // idを更新しないと、別idで複数保存可能になってしまう
-            NotesDataSource.saveNote(newNote)
+            notesRepository.saveNote(newNote)
             addEditNoteView.showSaveNote()
         }
     }
@@ -135,9 +137,9 @@ class AddEditNotePresenter(
         }
         val newNote = Note(title, content, RealmList(*urlSpanList.toTypedArray()), tag, id = noteId!!)
         if (newNote.isEmpty)
-            NotesDataSource.deleteNote(newNote.id)
+            notesRepository.deleteNote(newNote.id)
         else {
-            NotesDataSource.updateNote(newNote)
+            notesRepository.updateNote(newNote)
             addEditNoteView.showSaveNote()
         }
     }

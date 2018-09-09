@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -14,6 +13,7 @@ import android.widget.*
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import dagger.android.support.DaggerFragment
 import jp.shiita.basenote.R
 import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
@@ -22,8 +22,9 @@ import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.util.snackbarLong
 import kotlinx.android.synthetic.main.notes_act.*
 import java.util.*
+import javax.inject.Inject
 
-class NotesFragment : Fragment(), NotesContract.View {
+class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View {
 
     override var presenter: NotesContract.Presenter? = null
     private lateinit var notesAdapter: NotesAdapter

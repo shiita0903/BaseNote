@@ -2,24 +2,38 @@ package jp.shiita.basenote.textshare
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.notes.NotesActivity
+import javax.inject.Inject
 
-class TextShareActivity : AppCompatActivity() {
+class TextShareActivity : DaggerAppCompatActivity() {
+    @Inject lateinit var shareMenuFragment: ShareMenuDialogFragment
+    @Inject lateinit var selectNoteFragment: SelectNoteDialogFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         transparent()
         val action = intent.action
         val type = intent.type
         val text = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (action == Intent.ACTION_SEND && type == "text/plain") {
-            ShareMenuDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ShareMenuDialogFragment.ARGUMENT_SHARE_TEXT, text)
-                }
-            }.show(supportFragmentManager, ShareMenuDialogFragment.TAG)
+        if (action == Intent.ACTION_SEND && type == "text/plain")
+            showShareMenuDialogFragment(text)
+    }
+
+    fun showShareMenuDialogFragment(text: String) {
+        shareMenuFragment.arguments = Bundle().apply {
+            putString(ShareMenuDialogFragment.ARGUMENT_SHARE_TEXT, text)
         }
+        shareMenuFragment.show(fragmentManager, ShareMenuDialogFragment.TAG)
+    }
+
+    fun showSelectNoteDialogFragment(text: String, startApp: Boolean) {
+        selectNoteFragment.arguments = Bundle().apply {
+            putString(SelectNoteDialogFragment.ARGUMENT_APPEND_TEXT, text)
+            putBoolean(SelectNoteDialogFragment.ARGUMENT_START_APP, startApp)
+        }
+        selectNoteFragment.show(fragmentManager, SelectNoteDialogFragment.TAG)
     }
 
     /**

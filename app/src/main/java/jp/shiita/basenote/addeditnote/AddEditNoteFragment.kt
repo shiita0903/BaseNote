@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -19,13 +18,15 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
+import dagger.android.support.DaggerFragment
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.URLSpanData
 import jp.shiita.basenote.util.MyURLSpan
 import jp.shiita.basenote.util.snackbarLong
 import kotlinx.android.synthetic.main.addeditnote_act.*
+import javax.inject.Inject
 
-class AddEditNoteFragment : Fragment(), AddEditNoteContract.View, MyURLSpan.OnURLClickListener {
+class AddEditNoteFragment @Inject constructor() : DaggerFragment(), AddEditNoteContract.View, MyURLSpan.OnURLClickListener {
 
     override var presenter: AddEditNoteContract.Presenter? = null
 
