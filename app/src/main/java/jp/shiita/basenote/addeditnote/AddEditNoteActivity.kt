@@ -4,68 +4,78 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
+import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.NotesRepository
+import jp.shiita.basenote.databinding.AddeditnoteActBinding
+import jp.shiita.basenote.util.observe
 import jp.shiita.basenote.util.replaceFragment
 import javax.inject.Inject
 
 class AddEditNoteActivity : DaggerAppCompatActivity() {
-    private lateinit var fabTop: FloatingActionButton
-    private lateinit var fabBottom: FloatingActionButton
-    private lateinit var addEditNotePresenter: AddEditNotePresenter
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject lateinit var fragment: AddEditNoteFragment
     @Inject lateinit var notesRepository: NotesRepository
+    private val viewModel: AddEditNoteViewModel
+            by lazy { ViewModelProviders.of(this, viewModelFactory).get(AddEditNoteViewModel::class.java) }
+    private val binding: AddeditnoteActBinding
+            by lazy { DataBindingUtil.setContentView<AddeditnoteActBinding>(this, R.layout.addeditnote_act) }
+    private val noteId: String? by lazy { intent.getStringExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_ID) }
+    private val noteTag: Int by lazy { intent.getIntExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_TAG, 0)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.addeditnote_act)
+        binding.setLifecycleOwner(this)
+        binding.viewModel = viewModel
+        binding.addEditNoteFabBottom.setImageResource(R.drawable.ic_add)
 
         // Set up the toolbar.
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setDisplayShowHomeEnabled(true)
         }
-        fabTop = findViewById(R.id.fab_edit_note_done_top) as FloatingActionButton
-        fabBottom = findViewById(R.id.fab_edit_note_done_bottom) as FloatingActionButton
-
-        val noteId = intent.getStringExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID)
-        val noteTag = intent.getIntExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_TAG, 0)
-        setToolbarTitle(editMode = true)
-
-        var shouldLoadDataFromRepo = true
 
         if (savedInstanceState == null) {
             fragment.arguments = Bundle().apply {
-                putString(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID, noteId)
+                putString(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_ID, noteId)
+                putInt(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_TAG, noteTag)
             }
             supportFragmentManager.replaceFragment(R.id.container, fragment)
         }
-        else {
-            shouldLoadDataFromRepo = savedInstanceState.getBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY)
+
+        viewModel.editMode.observe(this) {
+            if (it) {
+                setTitle(R.string.edit_note)
+            }
+            else {
+                setTitle(R.string.read_note)
+                viewModel.saveNote()        // TODO: 新規作成時には保存しない
+            }
         }
-
-        // Create the presenter
-        addEditNotePresenter = AddEditNotePresenter(
-                noteId,
-                noteTag,
-                fragment,
-                shouldLoadDataFromRepo,
-                notesRepository)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        // Save the state so that next time we know if we need to refresh data.
-        outState.putBoolean(SHOULD_LOAD_DATA_FROM_REPO_KEY, addEditNotePresenter.isDataMissing)
-        super.onSaveInstanceState(outState)
+        viewModel.webMode.observe(this) {
+            if (it) {
+                switchTopFab()
+                supportActionBar?.hide()
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
+            }
+            else {
+                switchBottomFab()
+                supportActionBar?.show()
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            }
+        }
+        viewModel.fullScreenMode.observe(this) {
+            if (it) showTopFab()
+            else hideTopFab()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -73,28 +83,19 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         return true
     }
 
-    fun setToolbarTitle(editMode: Boolean) {
-        supportActionBar?.let {
-            if (editMode)
-                it.setTitle(R.string.edit_note)
-            else
-                it.setTitle(R.string.read_note)
-        }
+    private fun switchTopFab() {
+        startScaleAnim(visible = binding.addEditNoteFabTop, gone = binding.addEditNoteFabBottom)
     }
 
-    fun switchTopFab() {
-        startScaleAnim(visible = fabTop, gone = fabBottom)
+    private fun switchBottomFab() {
+        startScaleAnim(visible = binding.addEditNoteFabBottom, gone = binding.addEditNoteFabTop)
     }
 
-    fun switchBottomFab() {
-        startScaleAnim(visible = fabBottom, gone = fabTop)
-    }
-
-    fun showTopFab() {
-        getScaleAnim(fabTop, 500, toSmall = false).apply {
+    private fun showTopFab() {
+        getScaleAnim(binding.addEditNoteFabTop, 500, toSmall = false).apply {
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator?) {
-                    fabTop.apply {
+                    binding.addEditNoteFabTop.apply {
                         visibility = View.VISIBLE
                         scaleX = 0.1f
                         scaleY = 0.1f
@@ -105,20 +106,15 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         }
     }
 
-    fun hideTopFab() {
-        getScaleAnim(fabTop, 500, toSmall = true).run {
+    private fun hideTopFab() {
+        getScaleAnim(binding.addEditNoteFabTop, 500, toSmall = true).run {
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
-                    fabTop.visibility = View.GONE
+                    binding.addEditNoteFabTop.visibility = View.GONE
                 }
             })
             start()
         }
-    }
-
-    fun setFabIconResource(id: Int) {
-        fabTop.setImageResource(id)
-        fabBottom.setImageResource(id)
     }
 
     private fun startScaleAnim(visible: View, gone: View) {
@@ -161,10 +157,5 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
             interpolator = if (toSmall) AccelerateInterpolator() else DecelerateInterpolator()
             playTogether(anim1, anim2)
         }
-    }
-
-    companion object {
-        val SHOULD_LOAD_DATA_FROM_REPO_KEY = "SHOULD_LOAD_DATA_FROM_REPO_KEY"
-        val REQUEST_ADD_NOTE = 1
     }
 }

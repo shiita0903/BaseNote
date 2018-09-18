@@ -5,11 +5,12 @@ import dagger.android.ContributesAndroidInjector
 import jp.shiita.basenote.textshare.SelectNoteDialogFragment
 import jp.shiita.basenote.textshare.ShareMenuDialogFragment
 
+@Suppress("unused")
 @Module
-internal abstract class TextShareModule {
+abstract class TextShareModule {
     @ContributesAndroidInjector
-    internal abstract fun contributeShareMenuDialogFragment(): ShareMenuDialogFragment
+    abstract fun contributeShareMenuDialogFragment(): ShareMenuDialogFragment
 
     @ContributesAndroidInjector
-    internal abstract fun contributeSelectNoteDialogFragment(): SelectNoteDialogFragment
+    abstract fun contributeSelectNoteDialogFragment(): SelectNoteDialogFragment
 }

@@ -42,6 +42,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Support library
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:customtabs:$support_version"
     implementation "com.android.support:support-v4:$support_version"

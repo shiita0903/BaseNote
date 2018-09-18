@@ -18,10 +18,10 @@ open class Note(
     @PrimaryKey open var id: String = UUID.randomUUID().toString()
 ) : RealmObject() {
     val titleForList: String
-        get() = if (title.isEmpty()) content.trim() else title.trim()
+        get() = if (title.isBlank()) content.trim() else title.trim()
 
     val isEmpty: Boolean
-        get() = title.isEmpty() && content.isEmpty()
+        get() = title.isBlank() && content.isBlank()
 
     companion object {
         @Ignore val format = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)

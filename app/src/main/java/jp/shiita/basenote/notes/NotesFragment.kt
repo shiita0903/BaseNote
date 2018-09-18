@@ -19,7 +19,7 @@ import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
 import jp.shiita.basenote.addeditnote.SelectTagDialogFragment
 import jp.shiita.basenote.data.Note
-import jp.shiita.basenote.util.snackbarLong
+import jp.shiita.basenote.util.snackbar
 import kotlinx.android.synthetic.main.notes_act.*
 import java.util.*
 import javax.inject.Inject
@@ -154,9 +154,9 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
 
     override fun showAddNote() {
         val intent = Intent(context, AddEditNoteActivity::class.java).apply {
-            putExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_TAG, (activity as NotesActivity).filterTag)
+            putExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_TAG, (activity as NotesActivity).filterTag)
         }
-        startActivityForResult(intent, AddEditNoteActivity.REQUEST_ADD_NOTE)
+        startActivity(intent)
     }
 
     override fun showDeleteNote(title: String) = showMessage(getString(R.string.delete_note_message, title))
@@ -165,7 +165,7 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
 
     override fun showEditNoteUi(noteId: String) {
         val intent = Intent(context, AddEditNoteActivity::class.java).apply {
-            putExtra(AddEditNoteFragment.ARGUMENT_EDIT_NOTE_ID, noteId)
+            putExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_ID, noteId)
         }
         startActivity(intent)
     }
@@ -174,7 +174,7 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
 
     override fun showNoNotesError() = showMessage(getString(R.string.no_notes_error))
 
-    private fun showMessage(message: String) = view?.snackbarLong(message) ?: Unit
+    private fun showMessage(message: String) = view?.snackbar(message) ?: Unit
 
     private class NotesAdapter(val context: Context, notes: MutableList<Note>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

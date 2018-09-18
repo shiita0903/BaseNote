@@ -7,12 +7,14 @@ import dagger.android.support.AndroidSupportInjectionModule
 import jp.shiita.basenote.BaseNoteApp
 import jp.shiita.basenote.di.module.ActivityModule
 import jp.shiita.basenote.di.module.DataModule
+import jp.shiita.basenote.di.module.ViewModelModule
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [
     AndroidSupportInjectionModule::class,
     ActivityModule::class,
+    ViewModelModule::class,
     DataModule::class
 ])
 interface AppComponent : AndroidInjector<BaseNoteApp> {

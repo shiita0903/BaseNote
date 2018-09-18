@@ -6,6 +6,9 @@
         android:id="@+id/web_view_menu_update_link"
         android:title="@string/web_view_menu_update_link"/>
     <item
+        android:id="@+id/web_view_menu_remove_link"
+        android:title="@string/web_view_menu_remove_link"/>
+    <item
         android:id="@+id/web_view_menu_full_screen"
         android:title="@string/web_view_menu_full_screen"/>
 </menu>
