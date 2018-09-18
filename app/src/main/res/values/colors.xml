@@ -3,8 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="separator">#333333</color>
-    <drawable name="touchFeedback">#CFD8DC</drawable>
+
+    <color name="separator">#757575</color>
+    <color name="webViewBar">#CCCCCC</color>
 
     <color name="tag_white">#FFFFFF</color>
     <color name="tag_red">#ED1A3D</color>

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/recycler_view_height"
-    android:background="@drawable/touch_feedback"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="horizontal"
     android:paddingLeft="4dp">
 

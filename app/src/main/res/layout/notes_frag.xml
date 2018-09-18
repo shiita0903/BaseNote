@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
-                android:background="@drawable/touch_feedback"
+                android:background="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/no_notes_add" />
         </LinearLayout>
