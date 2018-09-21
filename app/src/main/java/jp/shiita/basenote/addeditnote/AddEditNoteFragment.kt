@@ -5,11 +5,11 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
+import android.graphics.Point
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -21,6 +21,7 @@ import jp.shiita.basenote.util.observe
 import jp.shiita.basenote.util.snackbar
 import javax.inject.Inject
 
+
 class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: AddEditNoteViewModel
@@ -28,6 +29,7 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     private lateinit var binding: FragAddEditNoteBinding
     private val noteId: String? by lazy { arguments?.getString(ARGUMENT_ADD_EDIT_NOTE_ID) }
     private val noteTag: Int by lazy { arguments?.getInt(ARGUMENT_ADD_EDIT_NOTE_TAG) ?: 0 }
+    private val displayHeight: Int by lazy { Point().also { activity?.windowManager?.defaultDisplay?.getRealSize(it) }.y }
     private var webViewWidth = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,13 +75,10 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
                 }
             }
             setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
-            viewTreeObserver.addOnGlobalLayoutListener {
-                Log.d(TAG, "update webViewWidth : $webViewWidth -> $width")
-                webViewWidth = width
-            }
+            viewTreeObserver.addOnGlobalLayoutListener { webViewWidth = width }
         }
 
-        // TODO: setTextIsSelectableがtrueだとmovementMethodが機能しないので注意する
+        // リンククリック処理
         binding.addEditNoteContent.run {
             movementMethod = LinkMovementMethod.getInstance()
             customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -111,31 +110,14 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
             }
         }
 
-        // TODO: 大きさ変更処理は後で書く
-//        with(root) {
-//            webViewBar = findViewById<View>(R.id.add_edit_note_web_view_bar).apply {
-//                setOnTouchListener(object : View.OnTouchListener {
-//                    private var beforeY: Float = 0f
-//                    private var first: Boolean = true
-//
-//                    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                        if (event == null) return false     // スマートキャスト
-//                        if (event.action == MotionEvent.ACTION_DOWN) first = true
-//                        val dy = beforeY - event.rawY
-//                        beforeY = event.rawY
-//
-//                        if (first)
-//                            first = false
-//                        else
-//                            webFrameLayout.layoutParams = webFrameLayout.layoutParams.apply {
-//                                height += dy.toInt()
-//                                if (height < 0) height = 0
-//                            }
-//                        return true
-//                    }
-//                })
-//            }
-//        }
+        // 大きさ変更処理
+        binding.addEditNoteWebViewBar.apply {
+            setOnTouchListener { _, event ->
+                val y = maxOf(0f, minOf(displayHeight.toFloat(), event.rawY))
+                binding.guideline.setGuidelinePercent(y / displayHeight)
+                true
+            }
+        }
     }
 
     private fun observe() {
