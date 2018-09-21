@@ -137,7 +137,6 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
                     when (item.itemId) {
                         R.id.web_view_menu_update_link -> viewModel.updateCurrentClickableURLSpan(binding.webView.url)
                         R.id.web_view_menu_remove_link -> viewModel.removeClickableURLSpan(binding.webView.url)
-                        R.id.web_view_menu_full_screen -> viewModel.switchFullScreen()
                     }
                     true
                 }

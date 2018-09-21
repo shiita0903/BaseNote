@@ -72,10 +72,6 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
                 window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             }
         }
-        viewModel.fullScreenMode.observe(this) {
-            if (it) showTopFab()
-            else hideTopFab()
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -89,32 +85,6 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
 
     private fun switchBottomFab() {
         startScaleAnim(visible = binding.addEditNoteFabBottom, gone = binding.addEditNoteFabTop)
-    }
-
-    private fun showTopFab() {
-        getScaleAnim(binding.addEditNoteFabTop, 500, toSmall = false).apply {
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationStart(animation: Animator?) {
-                    binding.addEditNoteFabTop.apply {
-                        visibility = View.VISIBLE
-                        scaleX = 0.1f
-                        scaleY = 0.1f
-                    }
-                }
-            })
-            start()
-        }
-    }
-
-    private fun hideTopFab() {
-        getScaleAnim(binding.addEditNoteFabTop, 500, toSmall = true).run {
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    binding.addEditNoteFabTop.visibility = View.GONE
-                }
-            })
-            start()
-        }
     }
 
     private fun startScaleAnim(visible: View, gone: View) {

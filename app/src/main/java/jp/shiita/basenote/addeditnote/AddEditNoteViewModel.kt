@@ -23,7 +23,6 @@ class AddEditNoteViewModel @Inject constructor(
     val tag            = MutableLiveData<Int>()
     val editMode       = MutableLiveData<Boolean>().apply { value = false }
     val webMode        = MutableLiveData<Boolean>().apply { value = false }
-    val fullScreenMode = MutableLiveData<Boolean>().apply { value = false }
     val canGoBack      = MutableLiveData<Boolean>().apply { value = false }
     val canGoForward   = MutableLiveData<Boolean>().apply { value = false }
 
@@ -134,10 +133,6 @@ class AddEditNoteViewModel @Inject constructor(
 
     fun stopWebMode() {
         webMode.postValue(false)
-    }
-
-    fun switchFullScreen() {
-        fullScreenMode.switch()
     }
 
     fun popupWebMenu() {
