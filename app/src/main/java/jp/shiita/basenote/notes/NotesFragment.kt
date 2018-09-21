@@ -20,7 +20,7 @@ import jp.shiita.basenote.addeditnote.AddEditNoteFragment
 import jp.shiita.basenote.addeditnote.SelectTagDialogFragment
 import jp.shiita.basenote.data.Note
 import jp.shiita.basenote.util.snackbar
-import kotlinx.android.synthetic.main.notes_act.*
+import kotlinx.android.synthetic.main.act_notes.*
 import java.util.*
 import javax.inject.Inject
 
@@ -39,7 +39,7 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.notes_frag, container, false)
+        val root = inflater.inflate(R.layout.frag_notes, container, false)
 
         notesAdapter = NotesAdapter(activity!!, mutableListOf()).apply {
             onClickNoteItem = { position -> presenter?.editNote(getItem(position)) }    // RecyclerViewの要素自体をタップ時
@@ -217,8 +217,8 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
         override fun getItemCount(): Int = notes.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
-            NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.note_item, parent, false), context)
-            AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.note_item_ad, parent, false),
+            NOTE_VIEW -> NoteViewHolder(inflater.inflate(R.layout.item_note, parent, false), context)
+            AD_VIEW -> AdViewHolder(inflater.inflate(R.layout.item_ad, parent, false),
                                     (displayWidth / density).toInt(),
                                     (context.resources.getDimension(R.dimen.recycler_view_height) / density).toInt(), context)
             else -> error("viewTypeが正しくありません")
@@ -283,7 +283,7 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
             val date = itemView.findViewById(R.id.note_item_date) as TextView
             val menu = itemView.findViewById(R.id.note_item_menu) as ImageButton
             val popup = PopupWindow(context).apply {
-                contentView = LayoutInflater.from(context).inflate(R.layout.note_menu, null)
+                contentView = LayoutInflater.from(context).inflate(R.layout.menu_note, null)
                 isOutsideTouchable = true
                 isFocusable = true
                 isTouchable = true

@@ -16,7 +16,7 @@ import android.webkit.WebViewClient
 import android.widget.PopupMenu
 import dagger.android.support.DaggerFragment
 import jp.shiita.basenote.R
-import jp.shiita.basenote.databinding.AddeditnoteFragBinding
+import jp.shiita.basenote.databinding.FragAddEditNoteBinding
 import jp.shiita.basenote.util.observe
 import jp.shiita.basenote.util.snackbar
 import javax.inject.Inject
@@ -25,14 +25,14 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: AddEditNoteViewModel
             by lazy { ViewModelProviders.of(activity!!, viewModelFactory).get(AddEditNoteViewModel::class.java) }
-    private lateinit var binding: AddeditnoteFragBinding
+    private lateinit var binding: FragAddEditNoteBinding
     private val noteId: String? by lazy { arguments?.getString(ARGUMENT_ADD_EDIT_NOTE_ID) }
     private val noteTag: Int by lazy { arguments?.getInt(ARGUMENT_ADD_EDIT_NOTE_TAG) ?: 0 }
     private var webViewWidth = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
-        binding = DataBindingUtil.inflate(inflater, R.layout.addeditnote_frag, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.frag_add_edit_note, container, false)
         return binding.root
     }
 

@@ -14,7 +14,7 @@ import android.view.animation.DecelerateInterpolator
 import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.NotesRepository
-import jp.shiita.basenote.databinding.AddeditnoteActBinding
+import jp.shiita.basenote.databinding.ActAddEditNoteBinding
 import jp.shiita.basenote.util.observe
 import jp.shiita.basenote.util.replaceFragment
 import javax.inject.Inject
@@ -25,8 +25,8 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
     @Inject lateinit var notesRepository: NotesRepository
     private val viewModel: AddEditNoteViewModel
             by lazy { ViewModelProviders.of(this, viewModelFactory).get(AddEditNoteViewModel::class.java) }
-    private val binding: AddeditnoteActBinding
-            by lazy { DataBindingUtil.setContentView<AddeditnoteActBinding>(this, R.layout.addeditnote_act) }
+    private val binding: ActAddEditNoteBinding
+            by lazy { DataBindingUtil.setContentView<ActAddEditNoteBinding>(this, R.layout.act_add_edit_note) }
     private val noteId: String? by lazy { intent.getStringExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_ID) }
     private val noteTag: Int by lazy { intent.getIntExtra(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_TAG, 0)}
 

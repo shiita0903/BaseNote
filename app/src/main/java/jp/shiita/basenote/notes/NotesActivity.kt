@@ -24,7 +24,7 @@ class NotesActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this, resources.getString(R.string.banner_ad_unit_id))    // 広告読み込み
-        setContentView(R.layout.notes_act)
+        setContentView(R.layout.act_notes)
 
         // Set up the toolbar.
         val toolbar = findViewById(R.id.toolbar) as Toolbar
