@@ -31,7 +31,7 @@ class AddEditNoteViewModel @Inject constructor(
     val noteEmptyEvent   = SingleUnitLiveEvent()
     val noteSavedEvent   = SingleLiveEvent<String>()
     val noteUpdatedEvent = SingleLiveEvent<String>()
-    val noteDeleteEvent  = SingleLiveEvent<String>()    // TODO: 削除できてない
+    val noteDeleteEvent  = SingleLiveEvent<String>()
     val goBackEvent      = SingleUnitLiveEvent()
     val goForwardEvent   = SingleUnitLiveEvent()
     val popupEvent       = SingleUnitLiveEvent()
@@ -66,17 +66,18 @@ class AddEditNoteViewModel @Inject constructor(
         if (isNewNote) {
             noteId = note.id
             repository.saveNote(note)
-            noteSavedEvent.postValue(title.value)
+            noteSavedEvent.postValue(note.titleForList)
         }
         else {
             repository.updateNote(note)
-            noteUpdatedEvent.postValue(title.value)
+            noteUpdatedEvent.postValue(note.titleForList)
         }
     }
 
     fun deleteNote() {
-        if (!isNewNote) repository.deleteNote(noteId!!)
-        noteDeleteEvent.postValue(title.value)
+        val note = getCurrentNote()
+        if (!isNewNote) repository.deleteNote(note.id)
+        noteDeleteEvent.postValue(note.titleForList)
     }
 
     fun updateTag(noteTag: Int) {
