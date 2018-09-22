@@ -5,13 +5,17 @@
 
     <item
         android:id="@+id/menu_select_tag"
-        compat:showAsAction="withText|always"
+        compat:showAsAction="ifRoom"
         android:icon="@drawable/ic_tag"
         android:title="@string/menu_select_tag"/>
 
     <item
         android:id="@+id/menu_delete"
-        compat:showAsAction="withText|never"
-        android:icon="@drawable/ic_delete"
+        compat:showAsAction="never"
         android:title="@string/menu_delete"/>
+
+    <item
+        android:id="@+id/menu_edit_finish"
+        compat:showAsAction="never"
+        android:title="@string/menu_edit_finish"/>
 </menu>

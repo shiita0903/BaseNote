@@ -34,14 +34,8 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding.setLifecycleOwner(this)
         binding.viewModel = viewModel
-        binding.addEditNoteFabBottom.setImageResource(R.drawable.ic_add)
-
-        // Set up the toolbar.
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setDisplayShowHomeEnabled(true)
-        }
+        setUpActionBar()
+        observe()
 
         if (savedInstanceState == null) {
             fragment.arguments = Bundle().apply {
@@ -50,31 +44,27 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
             }
             supportFragmentManager.replaceFragment(R.id.container, fragment)
         }
-
-        viewModel.editMode.observe(this) {
-            if (it) {
-                setTitle(R.string.edit_note)
-            }
-            else {
-                setTitle(R.string.read_note)
-                viewModel.saveNote()        // TODO: 新規作成時には保存しない
-            }
-        }
-        viewModel.webMode.observe(this) {
-            if (it) {
-                switchTopFab()
-                supportActionBar?.hide()
-            }
-            else {
-                switchBottomFab()
-                supportActionBar?.show()
-            }
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
+        finish()
+        return super.onSupportNavigateUp()
+    }
+
+    private fun setUpActionBar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+            setTitle(R.string.read_note)
+        }
+    }
+
+    private fun observe() {
+        viewModel.webMode.observe(this) {
+            if (it) switchTopFab()
+            else switchBottomFab()
+        }
     }
 
     private fun switchTopFab() {

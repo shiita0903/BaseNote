@@ -163,6 +163,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun switchEditMode() {
+        if (editMode.value == true) saveNote()
         _editMode.switch()
     }
 

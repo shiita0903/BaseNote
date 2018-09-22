@@ -152,7 +152,10 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         when (item.itemId) {
             R.id.menu_select_tag -> showSelectTagDialog()
             R.id.menu_delete -> viewModel.deleteNote()
-            R.id.home -> activity?.finish()
+            R.id.menu_edit_finish -> {
+                viewModel.saveNote()
+                activity?.finish()
+            }
             else -> return false
         }
         return true

@@ -6,6 +6,7 @@
 
     <data>
         <import type="jp.shiita.basenote.R"/>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="jp.shiita.basenote.addeditnote.AddEditNoteViewModel"/>
@@ -32,6 +33,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
                 android:theme="@style/Toolbar"
+                android:visibility="@{safeUnbox(viewModel.webMode) ? View.GONE : View.VISIBLE}"
+                app:title="@{safeUnbox(viewModel.editMode) ? R.string.edit_note : R.string.read_note}"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </android.support.design.widget.AppBarLayout>
 
