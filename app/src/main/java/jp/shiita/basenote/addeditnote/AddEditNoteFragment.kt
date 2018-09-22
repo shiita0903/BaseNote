@@ -125,7 +125,6 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     private fun observe() {
         // メニューを読み込み直して、タグの色を反映
         viewModel.tag.observe(this) { activity?.invalidateOptionsMenu() }
-        viewModel.urlEvent.observe(this) { binding.webView.loadUrl(it) }
         viewModel.noteEmptyEvent.observe(this) { binding.root.snackbar(R.string.empty_note_message) }
         viewModel.noteSavedEvent.observe(this) { binding.root.snackbar(getString(R.string.save_note_message, it)) }
         viewModel.noteUpdatedEvent.observe(this) { binding.root.snackbar(getString(R.string.update_note_message, it)) }

@@ -21,13 +21,13 @@ class AddEditNoteViewModel @Inject constructor(
     val title            = MutableLiveData<String>()
     val content          = MutableLiveData<Spannable>()
     val tag              = MutableLiveData<Int>()
+    val webViewUrl       = MutableLiveData<String>()
     val editMode         = MutableLiveData<Boolean>().apply { value = false }
     val webMode          = MutableLiveData<Boolean>().apply { value = false }
     val canGoBack        = MutableLiveData<Boolean>().apply { value = false }
     val canGoForward     = MutableLiveData<Boolean>().apply { value = false }
     val guidelinePercent = MutableLiveData<Float>().apply { value = 1f }
 
-    val urlEvent         = SingleLiveEvent<String>()
     val noteEmptyEvent   = SingleUnitLiveEvent()
     val noteSavedEvent   = SingleLiveEvent<String>()
     val noteUpdatedEvent = SingleLiveEvent<String>()
@@ -100,7 +100,7 @@ class AddEditNoteViewModel @Inject constructor(
         setClickableURLSpan(URLSpanData(url, start, end))
         webMode.postValue(true)
         guidelinePercent.postValue(beforePercent)
-        urlEvent.postValue(url)
+        webViewUrl.postValue(url)
     }
 
     fun removeClickableURLSpan(url: String) {
@@ -217,7 +217,7 @@ class AddEditNoteViewModel @Inject constructor(
 
         webMode.postValue(true)
         guidelinePercent.postValue(beforePercent)
-        urlEvent.postValue(url)
+        webViewUrl.postValue(url)
         getURLSpanDataList().firstOrNull()?.let {
             spanStart = it.start
             spanEnd   = it.end
