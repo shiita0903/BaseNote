@@ -1,5 +1,6 @@
 package jp.shiita.basenote.addeditnote
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.text.Spannable
@@ -17,38 +18,60 @@ import javax.inject.Inject
 class AddEditNoteViewModel @Inject constructor(
         private val repository: NotesRepository
 ) : ViewModel() {
-    // TODO: mutableをよく考える
-    val title            = MutableLiveData<String>()
-    val content          = MutableLiveData<Spannable>()
-    val tag              = MutableLiveData<Int>()
-    val webViewUrl       = MutableLiveData<String>()
-    val editMode         = MutableLiveData<Boolean>().apply { value = false }
-    val webMode          = MutableLiveData<Boolean>().apply { value = false }
-    val canGoBack        = MutableLiveData<Boolean>().apply { value = false }
-    val canGoForward     = MutableLiveData<Boolean>().apply { value = false }
-    val guidelinePercent = MutableLiveData<Float>().apply { value = 1f }
+    val title           = MutableLiveData<String>()
+    val content         = MutableLiveData<Spannable>()
+    val webViewUrl:       LiveData<String>    get() = _webViewUrl
+    val tag:              LiveData<Int>       get() = _tag
+    val editMode:         LiveData<Boolean>   get() = _editMode
+    val webMode:          LiveData<Boolean>   get() = _webMode
+    val canGoBack:        LiveData<Boolean>   get() = _canGoBack
+    val canGoForward:     LiveData<Boolean>   get() = _canGoForward
+    val guidelinePercent: LiveData<Float>     get() = _guidelinePercent
 
-    val noteEmptyEvent   = SingleUnitLiveEvent()
-    val noteSavedEvent   = SingleLiveEvent<String>()
-    val noteUpdatedEvent = SingleLiveEvent<String>()
-    val noteDeleteEvent  = SingleLiveEvent<String>()
-    val goBackEvent      = SingleUnitLiveEvent()
-    val goForwardEvent   = SingleUnitLiveEvent()
-    val popupEvent       = SingleUnitLiveEvent()
+    val noteEmptyEvent:   LiveData<Unit>      get() = _noteEmptyEvent
+    val noteSavedEvent:   LiveData<String>    get() = _noteSavedEvent
+    val noteUpdatedEvent: LiveData<String>    get() = _noteUpdatedEvent
+    val noteDeleteEvent:  LiveData<String>    get() = _noteDeleteEvent
+    val goBackEvent:      LiveData<Unit>      get() = _goBackEvent
+    val goForwardEvent:   LiveData<Unit>      get() = _goForwardEvent
+    val popupEvent:       LiveData<Unit>      get() = _popupEvent
+
+    private val _webViewUrl       = MutableLiveData<String>()
+    private val _tag              = MutableLiveData<Int>()
+    private val _editMode         = MutableLiveData<Boolean>().apply { value = false }
+    private val _webMode          = MutableLiveData<Boolean>().apply { value = false }
+    private val _canGoBack        = MutableLiveData<Boolean>().apply { value = false }
+    private val _canGoForward     = MutableLiveData<Boolean>().apply { value = false }
+    private val _guidelinePercent = MutableLiveData<Float>().apply { value = 1f }
+
+    private val _noteEmptyEvent   = SingleUnitLiveEvent()
+    private val _noteSavedEvent   = SingleLiveEvent<String>()
+    private val _noteUpdatedEvent = SingleLiveEvent<String>()
+    private val _noteDeleteEvent  = SingleLiveEvent<String>()
+    private val _goBackEvent      = SingleUnitLiveEvent()
+    private val _goForwardEvent   = SingleUnitLiveEvent()
+    private val _popupEvent       = SingleUnitLiveEvent()
 
     private var noteId: String? = null
-    private val isNewNote
-        get() = noteId == null
-    private var isDataLoaded = false
+    private val isNewNote: Boolean get() = noteId == null
+    private val currentNote: Note
+        get() = Note(
+                title.value ?: "",
+                content.value?.toString() ?: "",
+                RealmList(*getURLSpanDataList().toTypedArray()),
+                tag.value ?: 0).apply { if (!isNewNote) id = noteId!! }
+
     private var beforePercent = 0.5f
     private var spanStart = 0
     private var spanEnd = 0
 
-    fun start(noteId: String?, noteTag: Int) {
-        this.noteId = noteId
-        tag.value = noteTag
-        if (isNewNote) editMode.postValue(true)
-        if (isNewNote || isDataLoaded) return
+    fun start(id: String?, tag: Int) {
+        noteId = id
+        _tag.postValue(tag)
+        if (isNewNote) {
+            _editMode.postValue(true)
+            return
+        }
 
         noteId?.let {
             // TODO: repositoryもLiveDataにする
@@ -57,31 +80,31 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun saveNote() {
-        val note = getCurrentNote()
+        val note = currentNote
         if (note.isEmpty) {
-            noteEmptyEvent.call()
+            _noteEmptyEvent.call()
             return
         }
 
         if (isNewNote) {
             noteId = note.id
             repository.saveNote(note)
-            noteSavedEvent.postValue(note.titleForList)
+            _noteSavedEvent.postValue(note.titleForList)
         }
         else {
             repository.updateNote(note)
-            noteUpdatedEvent.postValue(note.titleForList)
+            _noteUpdatedEvent.postValue(note.titleForList)
         }
     }
 
     fun deleteNote() {
-        val note = getCurrentNote()
+        val note = currentNote
         if (!isNewNote) repository.deleteNote(note.id)
-        noteDeleteEvent.postValue(note.titleForList)
+        _noteDeleteEvent.postValue(note.titleForList)
     }
 
     fun updateTag(noteTag: Int) {
-        tag.postValue(noteTag)
+        _tag.postValue(noteTag)
         if (!isNewNote) {
             // 保存せずに戻ってもタグは変更されるようにする
             repository.getNote(noteId!!)?.let { note ->
@@ -92,62 +115,64 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun startSearch(start: Int, end: Int, type: SearchType) {
-        val word = content.value!!.subSequence(start, end).toString()
+        val word = content.value?.subSequence(start, end)?.toString() ?: return
         val url = when (type) {
             SearchType.GOOGLE    -> "http://www.google.co.jp/m/search?hl=ja&q="
             SearchType.WIKIPEDIA -> "https://ja.wikipedia.org/wiki/"
             SearchType.WEBLIO    -> "http://ejje.weblio.jp/content/"
         } + word
         setClickableURLSpan(URLSpanData(url, start, end))
-        webMode.postValue(true)
-        guidelinePercent.postValue(beforePercent)
-        webViewUrl.postValue(url)
+        _webMode.postValue(true)
+        _guidelinePercent.postValue(beforePercent)
+        _webViewUrl.postValue(url)
     }
 
     fun updateCurrentSpan() {
         val url = webViewUrl.value ?: return
         setClickableURLSpan(URLSpanData(url, spanStart, spanEnd))
-
-        val note = getCurrentNote()
-        if (!isNewNote && !note.isEmpty) {
-            repository.updateNote(note)
-        }
     }
 
     fun removeCurrentSpan() {
         val url = webViewUrl.value ?: return
         removeClickableURLSpan(url)
+    }
 
-        val note = getCurrentNote()
-        if (!isNewNote && !note.isEmpty) {
-            repository.updateNote(note)
-        }
+    fun setCanGoForward(canGoForward: Boolean) {
+        _canGoForward.postValue(canGoForward)
+    }
+
+    fun setCanGoBack(canGoBack: Boolean) {
+        _canGoBack.postValue(canGoBack)
     }
 
     fun goForward() {
-        if (canGoForward.value == true) goForwardEvent.call()
+        if (canGoForward.value == true) _goForwardEvent.call()
     }
 
     fun goBack() {
-        if (canGoBack.value == true) goBackEvent.call()
+        if (canGoBack.value == true) _goBackEvent.call()
+    }
+
+    fun updateUrl(url: String?) {
+        _webViewUrl.postValue(url)
     }
 
     fun setGuidelinePercent(percent: Float) {
         beforePercent = percent
-        guidelinePercent.postValue(percent)
+        _guidelinePercent.postValue(percent)
     }
 
     fun switchEditMode() {
-        editMode.switch()
+        _editMode.switch()
     }
 
     fun stopWebMode() {
-        webMode.postValue(false)
-        guidelinePercent.postValue(1f)
+        _webMode.postValue(false)
+        _guidelinePercent.postValue(1f)
     }
 
     fun popupWebMenu() {
-        popupEvent.call()
+        _popupEvent.call()
     }
 
     private fun populateNote(note: Note?) {
@@ -155,17 +180,7 @@ class AddEditNoteViewModel @Inject constructor(
 
         title.postValue(note.title)
         content.postValue(getSpannable(note.content, note.urlSpanList))
-        tag.postValue(note.tag)
-        isDataLoaded = true
-    }
-
-    private fun getCurrentNote(): Note {
-        val spanArray = getURLSpanDataList().toTypedArray()
-        return Note(
-                title.value ?: "",
-                content.value?.toString() ?: "",
-                RealmList(*spanArray),
-                tag.value ?: 0).apply { if (!isNewNote) id = noteId!! }
+        _tag.postValue(note.tag)
     }
 
     private fun getSpannable(text: String, spanDataList: List<URLSpanData>): Spannable =
@@ -178,7 +193,7 @@ class AddEditNoteViewModel @Inject constructor(
             }
 
     private fun removeClickableURLSpan(url: String) {
-        val spannable = content.value!!
+        val spannable = content.value ?: return
         val spans = spannable.getSpans(0, spannable.length, ClickableURLSpan::class.java)
 
         spans.filter { url == it.url &&
@@ -189,7 +204,7 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     private fun setClickableURLSpan(spanData: URLSpanData) {
-        val spannable = content.value!!
+        val spannable = content.value ?: return
         val spans = spannable.getSpans(0, spannable.length, ClickableURLSpan::class.java).toMutableList()
         var start = spanData.start
         var end   = spanData.end
@@ -228,9 +243,9 @@ class AddEditNoteViewModel @Inject constructor(
     private fun onClick(url: String) {
         if (editMode.value != false) return    // 編集中は無効化
 
-        webMode.postValue(true)
-        guidelinePercent.postValue(beforePercent)
-        webViewUrl.postValue(url)
+        _webMode.postValue(true)
+        _guidelinePercent.postValue(beforePercent)
+        _webViewUrl.postValue(url)
         getURLSpanDataList().firstOrNull()?.let {
             spanStart = it.start
             spanEnd   = it.end

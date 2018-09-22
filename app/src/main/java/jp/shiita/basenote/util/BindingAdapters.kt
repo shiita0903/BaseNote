@@ -26,7 +26,9 @@ fun EditText.inverseBindSpannable(): Spannable = text
 fun FloatingActionButton.bindImageResource(@DrawableRes resId: Int) = setImageResource(resId)
 
 @BindingAdapter("url")
-fun WebView.bindUrl(url: String?) = loadUrl(url)
+fun WebView.bindUrl(url: String?) {
+    if (this.url != url) loadUrl(url)
+}
 
 @Suppress("unused")
 @BindingMethods(BindingMethod(type = Guideline::class, attribute = "layout_constraintGuide_percent", method = "setGuidelinePercent"))

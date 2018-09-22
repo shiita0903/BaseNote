@@ -32,8 +32,8 @@
             android:layout_height="match_parent"
             android:hint="@string/title_hint"
             android:inputType="text"
-            android:focusable="@{viewModel.editMode}"
-            android:focusableInTouchMode="@{viewModel.editMode}"
+            android:focusable="@{safeUnbox(viewModel.editMode)}"
+            android:focusableInTouchMode="@{safeUnbox(viewModel.editMode)}"
             android:text="@={viewModel.title}"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -56,8 +56,8 @@
             android:hint="@string/content_hint"
             android:inputType="textMultiLine"
             android:scrollbars="vertical"
-            android:focusable="@{viewModel.editMode}"
-            android:focusableInTouchMode="@{viewModel.editMode}"
+            android:focusable="@{safeUnbox(viewModel.editMode)}"
+            android:focusableInTouchMode="@{safeUnbox(viewModel.editMode)}"
             app:spannable="@={viewModel.content}"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -66,14 +66,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="@{viewModel.guidelinePercent}" />
+        app:layout_constraintGuide_percent="@{safeUnbox(viewModel.guidelinePercent)}" />
 
     <View
         android:id="@+id/separator1"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/separator"
-        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        android:visibility="@{safeUnbox(viewModel.webMode) ? View.VISIBLE : View.GONE}"
         app:layout_constraintBottom_toTopOf="@+id/add_edit_note_web_view_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:background="@color/webViewBar"
         android:orientation="horizontal"
-        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        android:visibility="@{safeUnbox(viewModel.webMode) ? View.VISIBLE : View.GONE}"
         app:layout_constraintBottom_toTopOf="@+id/separator2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -98,7 +98,7 @@
             android:background="@null"
             android:contentDescription="@string/description_web_view_back"
             android:onClick="@{(_) -> viewModel.goBack()}"
-            android:visibility="@{viewModel.canGoBack ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{safeUnbox(viewModel.canGoBack) ? View.VISIBLE : View.INVISIBLE}"
             app:srcCompat="@drawable/ic_back" />
 
         <ImageButton
@@ -108,7 +108,7 @@
             android:background="@null"
             android:contentDescription="@string/description_web_view_forward"
             android:onClick="@{(_) -> viewModel.goForward()}"
-            android:visibility="@{viewModel.canGoForward ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{safeUnbox(viewModel.canGoForward) ? View.VISIBLE : View.INVISIBLE}"
             app:srcCompat="@drawable/ic_forward"
             tools:visibility="visible" />
 
@@ -142,7 +142,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/separator"
-        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        android:visibility="@{safeUnbox(viewModel.webMode) ? View.VISIBLE : View.GONE}"
         app:layout_constraintBottom_toTopOf="@+id/web_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -153,7 +153,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scrollbarStyle="insideOverlay"
-        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        android:visibility="@{safeUnbox(viewModel.webMode) ? View.VISIBLE : View.GONE}"
         app:url="@{viewModel.webViewUrl}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

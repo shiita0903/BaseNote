@@ -67,13 +67,15 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
             }
         })
 
+        // WebView初期化
         binding.webView.run {
             settings.javaScriptEnabled = true
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
-                    viewModel.canGoBack.value = binding.webView.canGoBack()
-                    viewModel.canGoForward.value = binding.webView.canGoForward()
                     super.onPageFinished(view, url)
+                    viewModel.setCanGoForward(canGoForward())
+                    viewModel.setCanGoBack(canGoBack())
+                    viewModel.updateUrl(url)
                 }
             }
             setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
