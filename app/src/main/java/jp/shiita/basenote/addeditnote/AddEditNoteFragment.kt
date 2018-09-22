@@ -5,8 +5,8 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
-import android.graphics.Point
 import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -29,12 +29,14 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     private lateinit var binding: FragAddEditNoteBinding
     private val noteId: String? by lazy { arguments?.getString(ARGUMENT_ADD_EDIT_NOTE_ID) }
     private val noteTag: Int by lazy { arguments?.getInt(ARGUMENT_ADD_EDIT_NOTE_TAG) ?: 0 }
-    private val displayHeight: Int by lazy { Point().also { activity?.windowManager?.defaultDisplay?.getRealSize(it) }.y }
+    private val statusBarHeight: Int by lazy { Rect().also { activity?.window?.decorView?.getWindowVisibleDisplayFrame(it) }.top }
+    private var fragmentHeight = 0
     private var webViewWidth = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
         binding = DataBindingUtil.inflate(inflater, R.layout.frag_add_edit_note, container, false)
+        binding.root.run { viewTreeObserver.addOnGlobalLayoutListener { fragmentHeight = height } }
         return binding.root
     }
 
@@ -113,8 +115,8 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         // 大きさ変更処理
         binding.addEditNoteWebViewBar.apply {
             setOnTouchListener { _, event ->
-                val y = maxOf(0f, minOf(displayHeight.toFloat(), event.rawY))
-                viewModel.setGuidelinePercent(y / displayHeight)
+                val y = maxOf(0f, minOf(fragmentHeight.toFloat(), event.rawY - statusBarHeight))
+                viewModel.setGuidelinePercent(y / fragmentHeight)
                 true
             }
         }

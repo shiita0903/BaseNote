@@ -64,12 +64,10 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
             if (it) {
                 switchTopFab()
                 supportActionBar?.hide()
-                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
             }
             else {
                 switchBottomFab()
                 supportActionBar?.show()
-                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             }
         }
     }
