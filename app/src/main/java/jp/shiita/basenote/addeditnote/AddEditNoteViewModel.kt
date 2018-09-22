@@ -18,19 +18,20 @@ class AddEditNoteViewModel @Inject constructor(
         private val repository: NotesRepository
 ) : ViewModel() {
     // TODO: mutableをよく考える
-    val title          = MutableLiveData<String>()
-    val content        = MutableLiveData<Spannable>()
-    val tag            = MutableLiveData<Int>()
-    val editMode       = MutableLiveData<Boolean>().apply { value = false }
-    val webMode        = MutableLiveData<Boolean>().apply { value = false }
-    val canGoBack      = MutableLiveData<Boolean>().apply { value = false }
-    val canGoForward   = MutableLiveData<Boolean>().apply { value = false }
+    val title            = MutableLiveData<String>()
+    val content          = MutableLiveData<Spannable>()
+    val tag              = MutableLiveData<Int>()
+    val editMode         = MutableLiveData<Boolean>().apply { value = false }
+    val webMode          = MutableLiveData<Boolean>().apply { value = false }
+    val canGoBack        = MutableLiveData<Boolean>().apply { value = false }
+    val canGoForward     = MutableLiveData<Boolean>().apply { value = false }
+    val guidelinePercent = MutableLiveData<Float>().apply { value = 1f }
 
     val urlEvent         = SingleLiveEvent<String>()
     val noteEmptyEvent   = SingleUnitLiveEvent()
     val noteSavedEvent   = SingleLiveEvent<String>()
     val noteUpdatedEvent = SingleLiveEvent<String>()
-    val noteDeleteEvent  = SingleLiveEvent<String>()
+    val noteDeleteEvent  = SingleLiveEvent<String>()    // TODO: 削除できてない
     val goBackEvent      = SingleUnitLiveEvent()
     val goForwardEvent   = SingleUnitLiveEvent()
     val popupEvent       = SingleUnitLiveEvent()
@@ -39,6 +40,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val isNewNote
         get() = noteId == null
     private var isDataLoaded = false
+    private var beforePercent = 0.5f
     private var spanStart = 0
     private var spanEnd = 0
 
@@ -97,6 +99,7 @@ class AddEditNoteViewModel @Inject constructor(
         } + word
         setClickableURLSpan(URLSpanData(url, start, end))
         webMode.postValue(true)
+        guidelinePercent.postValue(beforePercent)
         urlEvent.postValue(url)
     }
 
@@ -127,12 +130,18 @@ class AddEditNoteViewModel @Inject constructor(
         if (canGoBack.value == true) goBackEvent.call()
     }
 
+    fun setGuidelinePercent(percent: Float) {
+        beforePercent = percent
+        guidelinePercent.postValue(percent)
+    }
+
     fun switchEditMode() {
         editMode.switch()
     }
 
     fun stopWebMode() {
         webMode.postValue(false)
+        guidelinePercent.postValue(1f)
     }
 
     fun popupWebMenu() {
@@ -207,6 +216,7 @@ class AddEditNoteViewModel @Inject constructor(
         if (editMode.value != false) return    // 編集中は無効化
 
         webMode.postValue(true)
+        guidelinePercent.postValue(beforePercent)
         urlEvent.postValue(url)
         getURLSpanDataList().firstOrNull()?.let {
             spanStart = it.start

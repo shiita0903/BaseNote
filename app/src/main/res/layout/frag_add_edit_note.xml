@@ -11,145 +11,140 @@
             type="jp.shiita.basenote.addeditnote.AddEditNoteViewModel"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/add_edit_note_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:focusable="@{viewModel.editMode}"
+        android:focusableInTouchMode="@{viewModel.editMode}"
+        android:hint="@string/title_hint"
+        android:inputType="text"
+        android:text="@={viewModel.title}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/add_edit_note_content"/>
+
+    <EditText
+        android:id="@+id/add_edit_note_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:focusable="@{viewModel.editMode}"
+        android:focusableInTouchMode="@{viewModel.editMode}"
+        android:gravity="top"
+        android:hint="@string/content_hint"
+        android:inputType="textMultiLine"
+        app:spannable="@={viewModel.content}"
+        app:layout_constraintTop_toBottomOf="@+id/add_edit_note_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@{viewModel.guidelinePercent}" />
+
+    <View
+        android:id="@+id/separator1"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/separator"
+        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        app:layout_constraintBottom_toTopOf="@+id/add_edit_note_web_view_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline" />
+
+    <LinearLayout
+        android:id="@+id/add_edit_note_web_view_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:background="@color/webViewBar"
+        android:orientation="horizontal"
+        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        app:layout_constraintBottom_toTopOf="@+id/separator2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/separator1">
 
-        <ScrollView
-            android:id="@+id/add_edit_note_input"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:padding="@dimen/activity_padding"
-            app:layout_constraintBottom_toTopOf="@+id/guideline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <ImageButton
+            android:id="@+id/back_web_view_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:contentDescription="@string/description_web_view_back"
+            android:onClick="@{(_) -> viewModel.goBack()}"
+            android:visibility="@{viewModel.canGoBack ? View.VISIBLE : View.INVISIBLE}"
+            app:srcCompat="@drawable/ic_back" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+        <ImageButton
+            android:id="@+id/forward_web_view_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:contentDescription="@string/description_web_view_forward"
+            android:onClick="@{(_) -> viewModel.goForward()}"
+            android:visibility="@{viewModel.canGoForward ? View.VISIBLE : View.INVISIBLE}"
+            app:srcCompat="@drawable/ic_forward"
+            tools:visibility="visible" />
 
-                <EditText
-                    android:id="@+id/add_edit_note_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="@{viewModel.editMode}"
-                    android:focusableInTouchMode="@{viewModel.editMode}"
-                    android:hint="@string/title_hint"
-                    android:inputType="text"
-                    android:text="@={viewModel.title}" />
-
-                <EditText
-                    android:id="@+id/add_edit_note_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="@{viewModel.editMode}"
-                    android:focusableInTouchMode="@{viewModel.editMode}"
-                    android:gravity="top"
-                    android:hint="@string/content_hint"
-                    android:inputType="textMultiLine"
-                    android:minLines="30"
-                    app:spannable="@={viewModel.content}" />
-            </LinearLayout>
-        </ScrollView>
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5"/>
-
-        <View
-            android:id="@+id/separator1"
+        <Space
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/separator"
-            android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@id/add_edit_note_web_view_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/guideline" />
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="invisible" />
 
-        <LinearLayout
-            android:id="@+id/add_edit_note_web_view_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/webViewBar"
-            android:orientation="horizontal"
-            android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@+id/separator2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/separator1">
+        <ImageButton
+            android:id="@+id/menu_web_view_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:contentDescription="@string/description_web_view_menu"
+            android:onClick="@{(_) -> viewModel.popupWebMenu()}"
+            app:srcCompat="@drawable/ic_menu_grey" />
 
-            <ImageButton
-                android:id="@+id/back_web_view_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:contentDescription="@string/description_web_view_back"
-                android:onClick="@{(_) -> viewModel.goBack()}"
-                android:visibility="@{viewModel.canGoBack ? View.VISIBLE : View.INVISIBLE}"
-                app:srcCompat="@drawable/ic_back" />
+        <ImageButton
+            android:id="@+id/close_web_view_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:contentDescription="@string/description_web_view_close"
+            android:onClick="@{(_) -> viewModel.stopWebMode()}"
+            app:srcCompat="@drawable/ic_close" />
+    </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/forward_web_view_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:contentDescription="@string/description_web_view_forward"
-                android:onClick="@{(_) -> viewModel.goForward()}"
-                android:visibility="@{viewModel.canGoForward ? View.VISIBLE : View.INVISIBLE}"
-                app:srcCompat="@drawable/ic_forward"
-                tools:visibility="visible" />
+    <View
+        android:id="@+id/separator2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/separator"
+        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        app:layout_constraintBottom_toTopOf="@+id/web_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/add_edit_note_web_view_bar" />
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:visibility="invisible" />
-
-            <ImageButton
-                android:id="@+id/menu_web_view_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:contentDescription="@string/description_web_view_menu"
-                android:onClick="@{(_) -> viewModel.popupWebMenu()}"
-                app:srcCompat="@drawable/ic_menu_grey" />
-
-            <ImageButton
-                android:id="@+id/close_web_view_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:contentDescription="@string/description_web_view_close"
-                android:onClick="@{(_) -> viewModel.stopWebMode()}"
-                app:srcCompat="@drawable/ic_close" />
-        </LinearLayout>
-
-        <View
-            android:id="@+id/separator2"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/separator"
-            android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@+id/web_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_edit_note_web_view_bar" />
-
-        <WebView
-            android:id="@+id/web_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:scrollbarStyle="insideOverlay"
-            android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/separator2" />
-    </android.support.constraint.ConstraintLayout>
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scrollbarStyle="insideOverlay"
+        android:visibility="@{viewModel.webMode ? View.VISIBLE : View.GONE}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/separator2" />
+</android.support.constraint.ConstraintLayout>
 </layout>

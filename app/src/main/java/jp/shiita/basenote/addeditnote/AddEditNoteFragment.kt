@@ -114,7 +114,7 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         binding.addEditNoteWebViewBar.apply {
             setOnTouchListener { _, event ->
                 val y = maxOf(0f, minOf(displayHeight.toFloat(), event.rawY))
-                binding.guideline.setGuidelinePercent(y / displayHeight)
+                viewModel.setGuidelinePercent(y / displayHeight)
                 true
             }
         }

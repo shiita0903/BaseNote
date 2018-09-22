@@ -1,25 +1,32 @@
 package jp.shiita.basenote.util
 
 import android.databinding.BindingAdapter
+import android.databinding.BindingMethod
+import android.databinding.BindingMethods
 import android.databinding.InverseBindingAdapter
 import android.support.annotation.DrawableRes
+import android.support.constraint.Guideline
 import android.support.design.widget.FloatingActionButton
 import android.text.Spannable
 import android.widget.EditText
 
 
 @BindingAdapter("spannable")
-fun EditText.setSpannable(spannable: Spannable?) {
+fun EditText.bindSpannable(spannable: Spannable?) {
     if (text == null) setText(spannable)
     spannable ?: return
     if (!spannable.equal(text as Spannable)) setText(spannable)
 }
 
 @InverseBindingAdapter(attribute = "spannable", event = "android:textAttrChanged")
-fun EditText.getSpannable(): Spannable = text
+fun EditText.inverseBindSpannable(): Spannable = text
 
 @BindingAdapter("imageResource")
-fun FloatingActionButton.setImageResource(@DrawableRes resId: Int) = setImageResource(resId)
+fun FloatingActionButton.bindImageResource(@DrawableRes resId: Int) = setImageResource(resId)
+
+@Suppress("unused")
+@BindingMethods(BindingMethod(type = Guideline::class, attribute = "layout_constraintGuide_percent", method = "setGuidelinePercent"))
+object BindingRenameAdapters
 
 private fun Spannable.equal(s: Spannable): Boolean {
     if (toString() != s.toString()) return false
