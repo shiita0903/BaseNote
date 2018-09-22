@@ -136,8 +136,8 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
                 inflate(R.menu.web_view_menu)
                 setOnMenuItemClickListener { item ->
                     when (item.itemId) {
-                        R.id.web_view_menu_update_link -> viewModel.updateCurrentClickableURLSpan(binding.webView.url)
-                        R.id.web_view_menu_remove_link -> viewModel.removeClickableURLSpan(binding.webView.url)
+                        R.id.web_view_menu_update_link -> viewModel.updateCurrentSpan()
+                        R.id.web_view_menu_remove_link -> viewModel.removeCurrentSpan()
                     }
                     true
                 }

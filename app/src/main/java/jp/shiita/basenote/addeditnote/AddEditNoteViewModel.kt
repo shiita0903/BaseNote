@@ -104,19 +104,20 @@ class AddEditNoteViewModel @Inject constructor(
         webViewUrl.postValue(url)
     }
 
-    fun removeClickableURLSpan(url: String) {
-        val spannable = content.value!!
-        val spans = spannable.getSpans(0, spannable.length, ClickableURLSpan::class.java)
+    fun updateCurrentSpan() {
+        val url = webViewUrl.value ?: return
+        setClickableURLSpan(URLSpanData(url, spanStart, spanEnd))
 
-        spans.filter { url == it.url &&
-                spanStart == spannable.getSpanStart(it) &&
-                spanEnd   == spannable.getSpanEnd(it) }
-                .forEach { spannable.removeSpan(it) }
-        content.postValue(spannable)
+        val note = getCurrentNote()
+        if (!isNewNote && !note.isEmpty) {
+            repository.updateNote(note)
+        }
     }
 
-    fun updateCurrentClickableURLSpan(url: String) {
-        setClickableURLSpan(URLSpanData(url, spanStart, spanEnd))
+    fun removeCurrentSpan() {
+        val url = webViewUrl.value ?: return
+        removeClickableURLSpan(url)
+
         val note = getCurrentNote()
         if (!isNewNote && !note.isEmpty) {
             repository.updateNote(note)
@@ -175,6 +176,17 @@ class AddEditNoteViewModel @Inject constructor(
                     setSpan(span, spanData.start, spanData.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
             }
+
+    private fun removeClickableURLSpan(url: String) {
+        val spannable = content.value!!
+        val spans = spannable.getSpans(0, spannable.length, ClickableURLSpan::class.java)
+
+        spans.filter { url == it.url &&
+                spanStart == spannable.getSpanStart(it) &&
+                spanEnd   == spannable.getSpanEnd(it) }
+                .forEach { spannable.removeSpan(it) }
+        content.postValue(spannable)
+    }
 
     private fun setClickableURLSpan(spanData: URLSpanData) {
         val spannable = content.value!!
