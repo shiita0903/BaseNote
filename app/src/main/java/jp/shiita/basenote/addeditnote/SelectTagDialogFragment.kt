@@ -5,10 +5,12 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AlertDialog
 import jp.shiita.basenote.R
+import javax.inject.Inject
 
-class SelectTagDialogFragment : DialogFragment() {
+class SelectTagDialogFragment @Inject constructor() : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val tags = resources.getStringArray(R.array.tag_color_item)
         var selected = arguments!!.getInt(ARGUMENT_TAG)
@@ -31,9 +33,21 @@ class SelectTagDialogFragment : DialogFragment() {
                 .create()
     }
 
+    override fun show(manager: FragmentManager?, tag: String?) {
+        if (!checkShowingDialog(manager, tag)) {
+            super.show(manager, tag)
+        }
+    }
+
+    private fun checkShowingDialog(manager: FragmentManager?, tag: String?): Boolean {
+        val fragment = manager?.findFragmentByTag(tag ?: "") ?: return false
+        if (fragment is SelectTagDialogFragment) return fragment.dialog != null
+        return false
+    }
+
     companion object {
-        val ARGUMENT_TAG = "TAG"
-        val ARGUMENT_POSITION = "POSITION"
+        const val ARGUMENT_TAG = "argumentTag"
+        const val ARGUMENT_POSITION = "argumentPosition"
         val TAG = SelectTagDialogFragment::class.java.simpleName
     }
 }

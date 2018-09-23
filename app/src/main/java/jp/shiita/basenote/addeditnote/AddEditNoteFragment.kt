@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.databinding.DataBindingUtil
-import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -151,7 +150,8 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_select_tag -> showSelectTagDialog()
+            R.id.menu_select_tag ->
+                (activity as AddEditNoteActivity).showSelectTagDialogFragment(this, REQUEST_CODE_SELECT_TAG)
             R.id.menu_delete -> viewModel.deleteNote()
             R.id.menu_edit_finish -> {
                 viewModel.saveNote()
@@ -173,20 +173,11 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) return
         when (requestCode) {
-            SELECT_TAG_REQUEST_CODE -> {
+            REQUEST_CODE_SELECT_TAG -> {
                 val tag = data?.getIntExtra(SelectTagDialogFragment.ARGUMENT_TAG, 0) ?: return
                 viewModel.updateTag(tag)
             }
         }
-    }
-
-    private fun showSelectTagDialog() {
-        SelectTagDialogFragment().apply {
-            setTargetFragment(this@AddEditNoteFragment, SELECT_TAG_REQUEST_CODE)
-            arguments = Bundle().apply {
-                putInt(SelectTagDialogFragment.ARGUMENT_TAG, viewModel.tag.value ?: 0)
-            }
-        }.show(fragmentManager, SelectTagDialogFragment.TAG)
     }
 
     private fun showSearchMenu(mode: ActionMode?, itemId: Int, start: Int, end: Int): Boolean {
@@ -226,6 +217,6 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         private val TAG = AddEditNoteFragment::class.java.simpleName
         const val ARGUMENT_ADD_EDIT_NOTE_ID = "argumentAddEditNoteId"
         const val ARGUMENT_ADD_EDIT_NOTE_TAG = "argumentAddEditNoteTag"
-        const val SELECT_TAG_REQUEST_CODE = 0
+        const val REQUEST_CODE_SELECT_TAG = 0
     }
 }

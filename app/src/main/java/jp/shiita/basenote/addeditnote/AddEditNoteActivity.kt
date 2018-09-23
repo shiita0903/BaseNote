@@ -8,6 +8,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 class AddEditNoteActivity : DaggerAppCompatActivity() {
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject lateinit var fragment: AddEditNoteFragment
+    @Inject lateinit var addEditNoteFragment: AddEditNoteFragment
+    @Inject lateinit var selectTagDialogFragment: SelectTagDialogFragment
     @Inject lateinit var notesRepository: NotesRepository
     private val viewModel: AddEditNoteViewModel
             by lazy { ViewModelProviders.of(this, viewModelFactory).get(AddEditNoteViewModel::class.java) }
@@ -38,17 +40,26 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         observe()
 
         if (savedInstanceState == null) {
-            fragment.arguments = Bundle().apply {
+            addEditNoteFragment.arguments = Bundle().apply {
                 putString(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_ID, noteId)
                 putInt(AddEditNoteFragment.ARGUMENT_ADD_EDIT_NOTE_TAG, noteTag)
             }
-            supportFragmentManager.replaceFragment(R.id.container, fragment)
+            supportFragmentManager.replaceFragment(R.id.container, addEditNoteFragment)
         }
     }
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return super.onSupportNavigateUp()
+    }
+
+    fun showSelectTagDialogFragment(targetFragment: Fragment, requestCode: Int) {
+        selectTagDialogFragment.apply {
+            setTargetFragment(targetFragment, requestCode)
+            arguments = Bundle().apply {
+                putInt(SelectTagDialogFragment.ARGUMENT_TAG, viewModel.tag.value ?: 0)
+            }
+        }.show(supportFragmentManager, SelectTagDialogFragment.TAG)
     }
 
     private fun setupActionBar() {
