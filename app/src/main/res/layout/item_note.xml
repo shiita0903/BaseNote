@@ -13,7 +13,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="10dp"
-        app:srcCompat="@drawable/ic_tag"/>
+        android:src="@drawable/ic_tag"/>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -48,5 +48,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:background="#00000000"
-        app:srcCompat="@drawable/ic_recycler_menu"/>
+        android:src="@drawable/ic_recycler_menu"/>
 </LinearLayout>

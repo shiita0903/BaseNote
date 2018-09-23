@@ -4,9 +4,7 @@ import android.databinding.BindingAdapter
 import android.databinding.BindingMethod
 import android.databinding.BindingMethods
 import android.databinding.InverseBindingAdapter
-import android.support.annotation.DrawableRes
 import android.support.constraint.Guideline
-import android.support.design.widget.FloatingActionButton
 import android.text.Spannable
 import android.webkit.WebView
 import android.widget.EditText
@@ -21,9 +19,6 @@ fun EditText.bindSpannable(spannable: Spannable?) {
 
 @InverseBindingAdapter(attribute = "spannable", event = "android:textAttrChanged")
 fun EditText.inverseBindSpannable(): Spannable = text
-
-@BindingAdapter("imageResource")
-fun FloatingActionButton.bindImageResource(@DrawableRes resId: Int) = setImageResource(resId)
 
 @BindingAdapter("url")
 fun WebView.bindUrl(url: String?) {

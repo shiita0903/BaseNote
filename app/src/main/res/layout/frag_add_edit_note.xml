@@ -99,7 +99,7 @@
             android:contentDescription="@string/description_web_view_back"
             android:onClick="@{(_) -> viewModel.goBack()}"
             android:visibility="@{safeUnbox(viewModel.canGoBack) ? View.VISIBLE : View.INVISIBLE}"
-            app:srcCompat="@drawable/ic_back" />
+            android:src="@drawable/ic_back" />
 
         <ImageButton
             android:id="@+id/forward_web_view_button"
@@ -109,7 +109,7 @@
             android:contentDescription="@string/description_web_view_forward"
             android:onClick="@{(_) -> viewModel.goForward()}"
             android:visibility="@{safeUnbox(viewModel.canGoForward) ? View.VISIBLE : View.INVISIBLE}"
-            app:srcCompat="@drawable/ic_forward"
+            android:src="@drawable/ic_forward"
             tools:visibility="visible" />
 
         <Space
@@ -125,7 +125,7 @@
             android:background="@null"
             android:contentDescription="@string/description_web_view_menu"
             android:onClick="@{(_) -> viewModel.popupWebMenu()}"
-            app:srcCompat="@drawable/ic_menu" />
+            android:src="@drawable/ic_menu" />
 
         <ImageButton
             android:id="@+id/close_web_view_button"
@@ -134,7 +134,7 @@
             android:background="@null"
             android:contentDescription="@string/description_web_view_close"
             android:onClick="@{(_) -> viewModel.stopWebMode()}"
-            app:srcCompat="@drawable/ic_close" />
+            android:src="@drawable/ic_close" />
     </LinearLayout>
 
     <View

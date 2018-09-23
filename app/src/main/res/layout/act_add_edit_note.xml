@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="jp.shiita.basenote.R"/>
         <import type="android.view.View"/>
         <variable
             name="viewModel"
@@ -34,7 +33,7 @@
                 android:background="@color/colorPrimary"
                 android:theme="@style/Toolbar"
                 android:visibility="@{safeUnbox(viewModel.webMode) ? View.GONE : View.VISIBLE}"
-                app:title="@{safeUnbox(viewModel.editMode) ? R.string.edit_note : R.string.read_note}"
+                app:title="@{safeUnbox(viewModel.editMode) ? @string/edit_note : @string/read_note}"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </android.support.design.widget.AppBarLayout>
 
@@ -55,7 +54,7 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:visibility="gone"
                 android:onClick="@{(_) -> viewModel.switchEditMode()}"
-                app:imageResource="@{safeUnbox(viewModel.editMode) ? R.drawable.ic_done : R.drawable.ic_edit}"
+                android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
                 app:fabSize="normal"
                 app:layout_anchor="@id/container"
                 app:layout_anchorGravity="top|right|end"
@@ -68,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"
                 android:onClick="@{(_) -> viewModel.switchEditMode()}"
-                app:imageResource="@{safeUnbox(viewModel.editMode) ? R.drawable.ic_done : R.drawable.ic_edit}"
+                android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
                 app:fabSize="normal"
                 app:layout_anchor="@id/container"
                 app:layout_anchorGravity="bottom|right|end"
