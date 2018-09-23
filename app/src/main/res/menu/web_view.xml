@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/web_view_menu_update_link"
+        android:id="@+id/menu_web_view_update_link"
         android:title="@string/web_view_menu_update_link"/>
     <item
-        android:id="@+id/web_view_menu_remove_link"
+        android:id="@+id/menu_web_view_remove_link"
         android:title="@string/web_view_menu_remove_link"/>
 </menu>

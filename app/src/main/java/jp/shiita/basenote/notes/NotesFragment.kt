@@ -123,13 +123,13 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_refresh -> presenter?.loadNotes(true)
-            R.id.menu_delete_all -> presenter?.deleteAllNotes((activity as NotesActivity).filterTag)
+            R.id.menu_frag_notes_refresh -> presenter?.loadNotes(true)
+            R.id.menu_frag_notes_delete_all -> presenter?.deleteAllNotes((activity as NotesActivity).filterTag)
         }
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.notes_fragment_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) = inflater.inflate(R.menu.frag_notes, menu)
 
     override fun setLoadingIndicator(active: Boolean) {
         val root = view ?: return

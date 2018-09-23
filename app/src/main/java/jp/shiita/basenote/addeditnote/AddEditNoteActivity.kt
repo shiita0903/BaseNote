@@ -63,7 +63,7 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
     }
 
     private fun setupActionBar() {
-        setSupportActionBar(binding.toolbar)
+        setSupportActionBar(binding.addEditNoteToolbar)
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
             setTitle(R.string.read_note)

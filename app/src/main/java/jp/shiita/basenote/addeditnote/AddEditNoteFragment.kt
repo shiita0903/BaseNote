@@ -68,7 +68,7 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         })
 
         // WebView初期化
-        binding.webView.run {
+        binding.addEditNoteWebView.run {
             settings.javaScriptEnabled = true
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -97,13 +97,13 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
                 override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
                     // floating action modeに対応しているかどうかでメニュー表示を分ける
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        mode?.menuInflater?.inflate(R.menu.search_web_menu, menu)
+                        mode?.menuInflater?.inflate(R.menu.search, menu)
                     }
                     else {
                         // カット、全て選択の削除
                         menu?.removeItem(android.R.id.cut)
                         menu?.removeItem(android.R.id.selectAll)
-                        mode?.menuInflater?.inflate(R.menu.action_mode_menu, menu)
+                        mode?.menuInflater?.inflate(R.menu.action_mode, menu)
                     }
                     return true
                 }
@@ -131,15 +131,15 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
         viewModel.noteSavedEvent.observe(this) { binding.root.snackbar(getString(R.string.save_note_message, it)) }
         viewModel.noteUpdatedEvent.observe(this) { binding.root.snackbar(getString(R.string.update_note_message, it)) }
         viewModel.noteDeleteEvent.observe(this) { activity?.finish() }  // TODO: 戻ったactivityでメッセージ
-        viewModel.goBackEvent.observe(this)    { binding.webView.goBack() }
-        viewModel.goForwardEvent.observe(this) { binding.webView.goForward() }
+        viewModel.goBackEvent.observe(this)    { binding.addEditNoteWebView.goBack() }
+        viewModel.goForwardEvent.observe(this) { binding.addEditNoteWebView.goForward() }
         viewModel.popupEvent.observe(this) {
-            PopupMenu(context, binding.menuWebViewButton).apply {
-                inflate(R.menu.web_view_menu)
+            PopupMenu(context, binding.addEditNoteWebViewMenu).apply {
+                inflate(R.menu.web_view)
                 setOnMenuItemClickListener { item ->
                     when (item.itemId) {
-                        R.id.web_view_menu_update_link -> viewModel.updateCurrentSpan()
-                        R.id.web_view_menu_remove_link -> viewModel.removeCurrentSpan()
+                        R.id.menu_web_view_update_link -> viewModel.updateCurrentSpan()
+                        R.id.menu_web_view_remove_link -> viewModel.removeCurrentSpan()
                     }
                     true
                 }
@@ -150,10 +150,10 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_select_tag ->
+            R.id.menu_frag_add_edit_note_select_tag ->
                 (activity as AddEditNoteActivity).showSelectTagDialogFragment(this, REQUEST_CODE_SELECT_TAG)
-            R.id.menu_delete -> viewModel.deleteNote()
-            R.id.menu_edit_finish -> {
+            R.id.menu_frag_add_edit_note_delete -> viewModel.deleteNote()
+            R.id.menu_frag_add_edit_note_finish -> {
                 viewModel.saveNote()
                 activity?.finish()
             }
@@ -164,10 +164,10 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
         menu ?: return
-        inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
+        inflater.inflate(R.menu.frag_add_edit_note, menu)
         val tag = viewModel.tag.value ?: 0
         val color = resources.obtainTypedArray(R.array.tag_color).getColor(tag, 0)
-        menu.findItem(R.id.menu_select_tag).run { icon = icon.setTintCompat(color) }
+        menu.findItem(R.id.menu_frag_add_edit_note_select_tag).run { icon = icon.setTintCompat(color) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -197,9 +197,9 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
             }
         }
         else {
-            if (itemId == R.id.menu_search_web) {
-                PopupMenu(context, activity?.findViewById(R.id.menu_search_web)).apply {
-                    inflate(R.menu.search_web_menu)
+            if (itemId == R.id.menu_action_mode_search_web) {
+                PopupMenu(context, activity?.findViewById(R.id.menu_action_mode_search_web)).apply {
+                    inflate(R.menu.search)
                     setOnMenuItemClickListener {
                         if (it.itemId in searchTypeMap) { viewModel.startSearch(start, end, searchTypeMap[it.itemId]!!) }
                         true

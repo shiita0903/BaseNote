@@ -4,75 +4,69 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <import type="android.view.View"/>
-        <variable
-            name="viewModel"
-            type="jp.shiita.basenote.addeditnote.AddEditNoteViewModel"/>
-    </data>
+<data>
+    <import type="android.view.View"/>
+    <variable
+        name="viewModel"
+        type="jp.shiita.basenote.addeditnote.AddEditNoteViewModel"/>
+</data>
 
-<android.support.v4.widget.DrawerLayout
-    android:id="@+id/drawer_layout"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".addeditnote.AddEditNoteActivity">
 
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/add_edit_note_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:theme="@style/Toolbar"
+            android:visibility="@{safeUnbox(viewModel.webMode) ? View.GONE : View.VISIBLE}"
+            app:title="@{safeUnbox(viewModel.editMode) ? @string/edit_note : @string/read_note}"/>
+    </android.support.design.widget.AppBarLayout>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                android:theme="@style/Toolbar"
-                android:visibility="@{safeUnbox(viewModel.webMode) ? View.GONE : View.VISIBLE}"
-                app:title="@{safeUnbox(viewModel.editMode) ? @string/edit_note : @string/read_note}"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-        </android.support.design.widget.AppBarLayout>
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <android.support.design.widget.CoordinatorLayout
-            android:id="@+id/coordinatorLayout"
+        <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" />
 
-            <FrameLayout
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_edit_note_fab_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:visibility="gone"
+            android:onClick="@{(_) -> viewModel.switchEditMode()}"
+            android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
+            app:fabSize="normal"
+            app:layout_anchor="@id/container"
+            app:layout_anchorGravity="top|end"
+            tools:visibility="visible"
+            tools:src="@drawable/ic_done"
+            tools:layout_gravity="top|end"/>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/add_edit_note_fab_top"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:visibility="gone"
-                android:onClick="@{(_) -> viewModel.switchEditMode()}"
-                android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
-                app:fabSize="normal"
-                app:layout_anchor="@id/container"
-                app:layout_anchorGravity="top|right|end"
-                tools:visibility="visible"
-                tools:src="@drawable/ic_done"/>
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/add_edit_note_fab_bottom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:onClick="@{(_) -> viewModel.switchEditMode()}"
-                android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
-                app:fabSize="normal"
-                app:layout_anchor="@id/container"
-                app:layout_anchorGravity="bottom|right|end"
-                tools:src="@drawable/ic_done"/>
-        </android.support.design.widget.CoordinatorLayout>
-    </LinearLayout>
-</android.support.v4.widget.DrawerLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_edit_note_fab_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="@{(_) -> viewModel.switchEditMode()}"
+            android:src="@{safeUnbox(viewModel.editMode) ? @drawable/ic_done : @drawable/ic_edit}"
+            app:fabSize="normal"
+            app:layout_anchor="@id/container"
+            app:layout_anchorGravity="bottom|end"
+            tools:src="@drawable/ic_done"
+            tools:layout_gravity="bottom|end"/>
+    </android.support.design.widget.CoordinatorLayout>
+</LinearLayout>
 </layout>

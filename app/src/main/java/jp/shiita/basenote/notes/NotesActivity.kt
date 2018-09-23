@@ -28,7 +28,7 @@ class NotesActivity : DaggerAppCompatActivity() {
         setContentView(R.layout.act_notes)
 
         // Set up the toolbar.
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById(R.id.add_edit_note_toolbar) as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.let {
             it.setHomeAsUpIndicator(R.drawable.ic_menu_white)
@@ -61,15 +61,15 @@ class NotesActivity : DaggerAppCompatActivity() {
 
     private fun setupDrawerContent(navigationView: NavigationView) {
         val tags = listOf(
-                R.id.navigation_menu_item_all,
-                R.id.navigation_menu_item_red,
-                R.id.navigation_menu_item_orange,
-                R.id.navigation_menu_item_yellow,
-                R.id.navigation_menu_item_green,
-                R.id.navigation_menu_item_light_blue,
-                R.id.navigation_menu_item_blue,
-                R.id.navigation_menu_item_purple,
-                R.id.navigation_menu_item_black)
+                R.id.menu_drawer_all,
+                R.id.menu_drawer_red,
+                R.id.menu_drawer_orange,
+                R.id.menu_drawer_yellow,
+                R.id.menu_drawer_green,
+                R.id.menu_drawer_light_blue,
+                R.id.menu_drawer_blue,
+                R.id.menu_drawer_purple,
+                R.id.menu_drawer_black)
 
         // icon color
         navigationView.itemIconTintList = null
