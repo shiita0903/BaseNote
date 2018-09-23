@@ -125,7 +125,7 @@
             android:background="@null"
             android:contentDescription="@string/description_web_view_menu"
             android:onClick="@{(_) -> viewModel.popupWebMenu()}"
-            app:srcCompat="@drawable/ic_menu_grey" />
+            app:srcCompat="@drawable/ic_menu" />
 
         <ImageButton
             android:id="@+id/close_web_view_button"

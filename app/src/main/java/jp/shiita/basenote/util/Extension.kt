@@ -1,11 +1,15 @@
 package jp.shiita.basenote.util
 
 import android.arch.lifecycle.*
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
+import android.support.annotation.ColorInt
 import android.support.annotation.IdRes
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.graphics.drawable.DrawableCompat
 import android.view.View
 import org.reactivestreams.Publisher
 
@@ -20,6 +24,11 @@ fun View.snackbar(text: String, duration: Int = Snackbar.LENGTH_LONG) =
 
 fun View.snackbar(@StringRes resId: Int, duration: Int = Snackbar.LENGTH_LONG) =
         Snackbar.make(this, resId, duration).show()
+
+fun Drawable.setTintCompat(@ColorInt color: Int): Drawable = DrawableCompat.wrap(this).mutate().also {
+    DrawableCompat.setTint(it, color)
+    DrawableCompat.setTintMode(it, PorterDuff.Mode.SRC_IN)
+}
 
 fun MutableLiveData<Boolean>.switch() {
     val current = value ?: return

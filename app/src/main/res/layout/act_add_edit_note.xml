@@ -31,7 +31,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/colorPrimary"
                 android:theme="@style/Toolbar"
                 android:visibility="@{safeUnbox(viewModel.webMode) ? View.GONE : View.VISIBLE}"
                 app:title="@{safeUnbox(viewModel.editMode) ? R.string.edit_note : R.string.read_note}"

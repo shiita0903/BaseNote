@@ -34,7 +34,7 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding.setLifecycleOwner(this)
         binding.viewModel = viewModel
-        setUpActionBar()
+        setupActionBar()
         observe()
 
         if (savedInstanceState == null) {
@@ -51,11 +51,10 @@ class AddEditNoteActivity : DaggerAppCompatActivity() {
         return super.onSupportNavigateUp()
     }
 
-    private fun setUpActionBar() {
+    private fun setupActionBar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.run {
             setDisplayHomeAsUpEnabled(true)
-            setDisplayShowHomeEnabled(true)
             setTitle(R.string.read_note)
         }
     }

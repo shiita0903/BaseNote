@@ -7,7 +7,7 @@
     <color name="separator">#757575</color>
     <color name="webViewBar">#CCCCCC</color>
 
-    <color name="tag_white">#FFFFFF</color>
+    <color name="tag_none">#757575</color>
     <color name="tag_red">#ED1A3D</color>
     <color name="tag_orange">#FF5900</color>
     <color name="tag_yellow">#FFD400</color>
@@ -17,7 +17,7 @@
     <color name="tag_purple">#A757A8</color>
     <color name="tag_black">#111111</color>
     <array name="tag_color">
-        <item>@color/tag_white</item>
+        <item>@color/tag_none</item>
         <item>@color/tag_red</item>
         <item>@color/tag_orange</item>
         <item>@color/tag_yellow</item>

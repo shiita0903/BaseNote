@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/list_navigation_menu_item_all"
-        android:icon="@drawable/ic_list"
+        android:id="@+id/navigation_menu_item_all"
+        android:icon="@drawable/ic_tag"
         android:title="@string/list_title" />
     <item
-        android:id="@+id/list_navigation_menu_item_red"
-        android:icon="@drawable/ic_tag_red"
+        android:id="@+id/navigation_menu_item_red"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_red" />
     <item
-        android:id="@+id/list_navigation_menu_item_orange"
-        android:icon="@drawable/ic_tag_orange"
+        android:id="@+id/navigation_menu_item_orange"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_orange" />
     <item
-        android:id="@+id/list_navigation_menu_item_yellow"
-        android:icon="@drawable/ic_tag_yellow"
+        android:id="@+id/navigation_menu_item_yellow"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_yellow" />
     <item
-        android:id="@+id/list_navigation_menu_item_green"
-        android:icon="@drawable/ic_tag_green"
+        android:id="@+id/navigation_menu_item_green"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_green" />
     <item
-        android:id="@+id/list_navigation_menu_item_light_blue"
-        android:icon="@drawable/ic_tag_light_blue"
+        android:id="@+id/navigation_menu_item_light_blue"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_light_blue" />
     <item
-        android:id="@+id/list_navigation_menu_item_blue"
-        android:icon="@drawable/ic_tag_blue"
+        android:id="@+id/navigation_menu_item_blue"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_blue" />
     <item
-        android:id="@+id/list_navigation_menu_item_purple"
-        android:icon="@drawable/ic_tag_purple"
+        android:id="@+id/navigation_menu_item_purple"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_purple" />
     <item
-        android:id="@+id/list_navigation_menu_item_black"
-        android:icon="@drawable/ic_tag_black"
+        android:id="@+id/navigation_menu_item_black"
+        android:icon="@drawable/ic_tag"
         android:title="@string/tag_black" />
 </menu>

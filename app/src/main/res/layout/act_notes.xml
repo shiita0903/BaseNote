@@ -50,7 +50,6 @@
 
     </LinearLayout>
 
-    <!-- Navigation Drawer -->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -58,5 +57,4 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:menu="@menu/drawer_actions" />
-
 </android.support.v4.widget.DrawerLayout>

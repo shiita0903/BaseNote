@@ -18,6 +18,7 @@ import dagger.android.support.DaggerFragment
 import jp.shiita.basenote.R
 import jp.shiita.basenote.databinding.FragAddEditNoteBinding
 import jp.shiita.basenote.util.observe
+import jp.shiita.basenote.util.setTintCompat
 import jp.shiita.basenote.util.snackbar
 import javax.inject.Inject
 
@@ -162,15 +163,11 @@ class AddEditNoteFragment @Inject constructor() : DaggerFragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+        menu ?: return
         inflater.inflate(R.menu.addeditnote_fragment_menu, menu)
         val tag = viewModel.tag.value ?: 0
-        // TODO: もっときれいに書けるはず
-        if (tag != 0)
-            menu?.getItem(0)?.icon?.setColorFilter(
-                    resources.obtainTypedArray(R.array.tag_color).getColor(tag, 0),
-                    PorterDuff.Mode.SRC_IN)
-        else
-            menu?.getItem(0)?.icon?.colorFilter = null
+        val color = resources.obtainTypedArray(R.array.tag_color).getColor(tag, 0)
+        menu.findItem(R.id.menu_select_tag).run { icon = icon.setTintCompat(color) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -19,6 +19,7 @@ import jp.shiita.basenote.addeditnote.AddEditNoteActivity
 import jp.shiita.basenote.addeditnote.AddEditNoteFragment
 import jp.shiita.basenote.addeditnote.SelectTagDialogFragment
 import jp.shiita.basenote.data.Note
+import jp.shiita.basenote.util.setTintCompat
 import jp.shiita.basenote.util.snackbar
 import kotlinx.android.synthetic.main.act_notes.*
 import java.util.*
@@ -299,7 +300,8 @@ class NotesFragment @Inject constructor() : DaggerFragment(), NotesContract.View
                 if (note.tag == 0) tag.visibility = View.INVISIBLE
                 else {
                     tag.visibility = View.VISIBLE
-                    tag.setColorFilter(context.resources.obtainTypedArray(R.array.tag_color).getColor(note.tag, 0))
+                    val color = context.resources.obtainTypedArray(R.array.tag_color).getColor(note.tag, 0)
+                    tag.setImageDrawable(tag.drawable.setTintCompat(color))
                 }
                 title.text = note.titleForList
                 date.text = Note.format.format(Date(note.date))

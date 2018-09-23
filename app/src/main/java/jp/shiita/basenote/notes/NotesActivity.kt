@@ -11,6 +11,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import jp.shiita.basenote.R
 import jp.shiita.basenote.data.NotesRepository
 import jp.shiita.basenote.util.replaceFragment
+import jp.shiita.basenote.util.setTintCompat
 import javax.inject.Inject
 
 class NotesActivity : DaggerAppCompatActivity() {
@@ -30,7 +31,7 @@ class NotesActivity : DaggerAppCompatActivity() {
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.let {
-            it.setHomeAsUpIndicator(R.drawable.ic_menu)
+            it.setHomeAsUpIndicator(R.drawable.ic_menu_white)
             it.setDisplayHomeAsUpEnabled(true)
         }
 
@@ -59,25 +60,31 @@ class NotesActivity : DaggerAppCompatActivity() {
     }
 
     private fun setupDrawerContent(navigationView: NavigationView) {
-        val tags = mapOf(
-                R.id.list_navigation_menu_item_all to 0,
-                R.id.list_navigation_menu_item_red to 1,
-                R.id.list_navigation_menu_item_orange to 2,
-                R.id.list_navigation_menu_item_yellow to 3,
-                R.id.list_navigation_menu_item_green to 4,
-                R.id.list_navigation_menu_item_light_blue to 5,
-                R.id.list_navigation_menu_item_blue to 6,
-                R.id.list_navigation_menu_item_purple to 7,
-                R.id.list_navigation_menu_item_black to 8)
+        val tags = listOf(
+                R.id.navigation_menu_item_all,
+                R.id.navigation_menu_item_red,
+                R.id.navigation_menu_item_orange,
+                R.id.navigation_menu_item_yellow,
+                R.id.navigation_menu_item_green,
+                R.id.navigation_menu_item_light_blue,
+                R.id.navigation_menu_item_blue,
+                R.id.navigation_menu_item_purple,
+                R.id.navigation_menu_item_black)
 
-        navigationView.itemIconTintList = null  // アイコンの色が表示されるように
+        // icon color
+        navigationView.itemIconTintList = null
+        tags.forEachIndexed { i, id ->
+            val color = resources.obtainTypedArray(R.array.tag_color).getColor(i, 0)
+            navigationView.menu.findItem(id).run { icon = icon.setTintCompat(color) }
+        }
+
         navigationView.setNavigationItemSelectedListener { menuItem ->
-            filterTag = tags[menuItem.itemId]!!
+            filterTag = tags.indexOf(menuItem.itemId)
             notesPresenter.filterNotes(filterTag)
-            (0 until navigationView.menu.size()).forEach { navigationView.menu.getItem(it).isChecked = false }
+            navigationView.menu.run { tags.forEach { id -> findItem(id).isChecked = false } }
             menuItem.isChecked = true
             val title = getString(R.string.app_name) +
-                    if (filterTag != 0) " [" + resources.getStringArray(R.array.tag_color_item)[filterTag] + "]"
+                    if (filterTag != 0) " [${resources.getStringArray(R.array.tag_color_item)[filterTag]}]"
                     else ""
             supportActionBar?.title = title
             drawerLayout.closeDrawers()
